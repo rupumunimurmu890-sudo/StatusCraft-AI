@@ -1,190 +1,489 @@
-const data = {
-  "Motivation": [
-    "मुश्किल रास्ते अक्सर खूबसूरत मंज़िल तक ले जाते हैं।",
-    "आज की छोटी कोशिश, कल की बड़ी सफलता बन सकती है।",
-    "खुद पर विश्वास रखो, रास्ते खुद बनेंगे।",
-    "हार सिर्फ तब होती है जब हम कोशिश करना छोड़ देते हैं।"
-  ],
-  "Love": [
-    "सच्चा रिश्ता शब्दों से नहीं, एहसासों से पहचाना जाता है।",
-    "जहाँ सम्मान और भरोसा हो, वहीं प्यार खूबसूरत बनता है।",
-    "कुछ लोग जिंदगी में आते हैं और जिंदगी खूबसूरत बना देते हैं।"
-  ],
-  "Sad": [
-    "हर मुस्कान के पीछे एक कहानी होती है, हर खामोशी के पीछे एक एहसास।",
-    "समय बदलता है, और इंसान भी बहुत कुछ सीख जाता है।",
-    "कुछ बातें दिल में रह जाती हैं, क्योंकि हर बात कही नहीं जाती।"
-  ],
-  "Good Morning": [
-    "नई सुबह, नई उम्मीद और एक नई शुरुआत। शुभ प्रभात! 🌅",
-    "आज का दिन कल से बेहतर बनाने की कोशिश करें। सुप्रभात! ☀️"
-  ],
-  "Good Night": [
-    "दिन खत्म हुआ, उम्मीद नहीं। कल फिर एक नई शुरुआत होगी। शुभ रात्रि! 🌙",
-    "सुकून भरी नींद और खूबसूरत सपनों के साथ शुभ रात्रि। ✨"
-  ],
-  "Friendship": [
-    "अच्छे दोस्त जिंदगी की सबसे खूबसूरत यादों का हिस्सा होते हैं।",
-    "सच्ची दोस्ती दूरी से नहीं, दिल से जुड़ी रहती है।"
-  ],
-  "Spiritual": [
-    "सच्ची शांति बाहर नहीं, हमारे विचारों और कर्मों की पवित्रता में मिलती है।",
-    "प्रेम, दया, सत्य और सेवा—हर इंसान को बेहतर बनाने वाले रास्ते हैं।",
-    "ईश्वर की ओर बढ़ने का एक सुंदर रास्ता अच्छे कर्म और करुणा है।"
-  ],
-  "Festival": [
-    "खुशियाँ बाँटिए, प्यार बढ़ाइए और हर त्योहार को यादगार बनाइए। 🎉",
-    "त्योहार का असली आनंद अपनों के साथ खुशियाँ बाँटने में है। ❤️"
-  ]
-};
+// ========================================
+// StatusCraft AI - Main JavaScript (Phase 1)
+// ========================================
 
-const categories = Object.keys(data);
-const categorySelect = document.getElementById("categorySelect");
-const quoteInput = document.getElementById("quoteInput");
-const userName = document.getElementById("userName");
-const canvas = document.getElementById("statusCanvas");
-const ctx = canvas.getContext("2d");
+let QUOTES_DATA = {};
+let currentQuote = "";
 
-categories.forEach(cat => {
-  categorySelect.add(new Option(cat, cat));
-});
+// ------------------------------------
+// Quotes data load karo
+// ------------------------------------
 
-const categoryBox = document.getElementById("categories");
-categories.forEach((cat, i) => {
-  const b = document.createElement("button");
-  b.className = "cat" + (i === 0 ? " active" : "");
-  b.textContent = cat;
-  b.onclick = () => {
-    document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    categorySelect.value = cat;
-    setRandomQuote();
-  };
-  categoryBox.appendChild(b);
-});
+async function loadQuotes() {
 
-function setRandomQuote() {
-  const cat = categorySelect.value;
-  const list = data[cat];
-  quoteInput.value = list[Math.floor(Math.random() * list.length)];
-  drawStatus();
+  try {
+
+    const response = await fetch("quotes.json");
+    QUOTES_DATA = await response.json();
+
+  } catch (error) {
+
+    console.error("Quotes load error:", error);
+  }
 }
 
-function roundedRect(ctx,x,y,w,h,r){
-  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
-}
 
-function drawStatus() {
-  const w = canvas.width, h = canvas.height;
-  const cat = categorySelect.value;
-  const quote = quoteInput.value.trim() || "आज एक नई शुरुआत है।";
-  const name = userName.value.trim();
+// ------------------------------------
+// Random quote nikalo category + language se
+// ------------------------------------
 
-  const gradients = {
-    Motivation:["#1e1b4b","#7c3aed"],
-    Love:["#831843","#ec4899"],
-    Sad:["#172554","#334155"],
-    "Good Morning":["#7c2d12","#f59e0b"],
-    "Good Night":["#111827","#312e81"],
-    Friendship:["#134e4a","#0f766e"],
-    Spiritual:["#3b0764","#7e22ce"],
-    Festival:["#7c2d12","#dc2626"]
-  };
-  const [a,b] = gradients[cat] || ["#111827","#6d28d9"];
-  const g = ctx.createLinearGradient(0,0,w,h);
-  g.addColorStop(0,a); g.addColorStop(1,b);
-  ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+function getRandomQuote() {
 
-  // soft decorative circles
-  ctx.globalAlpha=.13;
-  ctx.fillStyle="#fff";
-  [[120,170,90],[920,300,140],[150,1630,170],[920,1770,100]].forEach(([x,y,r])=>{
-    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
-  });
-  ctx.globalAlpha=1;
+  const category =
+    document.getElementById("category")?.value || "Motivational";
 
-  ctx.fillStyle="rgba(255,255,255,.18)";
-  roundedRect(ctx,70,75,260,62,31);ctx.fill();
-  ctx.fillStyle="#fff";ctx.font="700 30px system-ui";ctx.fillText(cat,105,116);
+  const language =
+    document.getElementById("language")?.value || "Hindi";
 
-  ctx.textAlign="center";
-  ctx.fillStyle="#fff";
-  ctx.font="800 62px system-ui";
-  ctx.fillText("✨ Daily Status",w/2,250);
+  const list =
+    QUOTES_DATA?.[category]?.[language] || [];
 
-  ctx.font="700 46px system-ui";
-  wrapText(ctx, quote, w/2, 760, 850, 72);
-
-  ctx.font="500 27px system-ui";
-  ctx.fillStyle="rgba(255,255,255,.82)";
-  ctx.fillText("Make today beautiful.",w/2,1480);
-
-  if(name){
-    ctx.font="700 34px system-ui";
-    ctx.fillStyle="#fff";
-    ctx.fillText("— " + name,w/2,1590);
+  if (list.length === 0) {
+    return "Quote उपलब्ध नहीं है इस भाषा/category में।";
   }
 
-  ctx.font="600 25px system-ui";
-  ctx.fillStyle="rgba(255,255,255,.72)";
-  ctx.fillText("Daily Status AI",w/2,1820);
-  ctx.textAlign="left";
+  const randomIndex =
+    Math.floor(Math.random() * list.length);
+
+  return list[randomIndex];
 }
 
-function wrapText(ctx,text,x,y,maxWidth,lineHeight){
-  const words=text.split(/\s+/); let line="", lines=[];
-  for(const word of words){
-    const test=line ? line+" "+word : word;
-    if(ctx.measureText(test).width > maxWidth && line){ lines.push(line); line=word; }
-    else line=test;
+
+document.addEventListener("DOMContentLoaded", async function () {
+
+  await loadQuotes();
+
+  const quoteText =
+    document.getElementById("quoteText");
+
+  const getQuoteBtn =
+    document.getElementById("getQuoteBtn");
+
+  if (getQuoteBtn) {
+
+    getQuoteBtn.addEventListener("click", function () {
+
+      currentQuote = getRandomQuote();
+
+      if (quoteText) {
+        quoteText.textContent = currentQuote;
+      }
+    });
   }
-  if(line) lines.push(line);
-  const start=y-(lines.length-1)*lineHeight/2;
-  lines.forEach((l,i)=>ctx.fillText(l,x,start+i*lineHeight));
-}
 
-document.getElementById("randomBtn").onclick=setRandomQuote;
-categorySelect.onchange=setRandomQuote;
-quoteInput.oninput=drawStatus;
-userName.oninput=drawStatus;
-document.getElementById("createBtn").onclick=drawStatus;
+  // Pehli quote load hote hi dikha do
+  currentQuote = getRandomQuote();
 
-document.getElementById("downloadBtn").onclick=()=>{
-  const a=document.createElement("a");
-  a.download="daily-status.png";
-  a.href=canvas.toDataURL("image/png");
-  a.click();
+  if (quoteText) {
+    quoteText.textContent = currentQuote;
+  }
+
+
+  // ------------------------------------
+  // Photo preview
+  // ------------------------------------
+
+  const photoInput =
+    document.getElementById("photoInput");
+
+  const photoPreview =
+    document.getElementById("photoPreview");
+
+  if (photoInput) {
+
+    photoInput.addEventListener("change", function () {
+
+      const file = this.files[0];
+
+      if (file && photoPreview) {
+        photoPreview.src = URL.createObjectURL(file);
+        photoPreview.style.display = "block";
+      }
+    });
+  }
+
+
+  // ------------------------------------
+  // Generate Status
+  // ------------------------------------
+
+  const generateBtn =
+    document.getElementById("generateStatusBtn");
+
+  if (generateBtn) {
+
+    generateBtn.addEventListener("click", generateStatus);
+  }
+
+});
+
+
+// ------------------------------------
+// Template color presets
+// ------------------------------------
+
+const TEMPLATE_COLORS = {
+
+  purple: {
+    from: "#3a1c71",
+    to: "#7b4de0",
+    text: "#ffffff",
+    accent: "#f6c453"
+  },
+
+  sunset: {
+    from: "#ff512f",
+    to: "#f09819",
+    text: "#ffffff",
+    accent: "#ffe9c7"
+  },
+
+  ocean: {
+    from: "#005c97",
+    to: "#363795",
+    text: "#ffffff",
+    accent: "#8fd3f4"
+  },
+
+  gold: {
+    from: "#bf953f",
+    to: "#3a2c0f",
+    text: "#ffffff",
+    accent: "#fcf6ba"
+  }
+
 };
 
-document.getElementById("shareBtn").onclick=async()=>{
-  canvas.toBlob(async blob=>{
-    const file=new File([blob],"daily-status.png",{type:"image/png"});
-    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({title:"My Daily Status",files:[file]});
+
+// ------------------------------------
+// Line wrap helper (canvas text wrap)
+// ------------------------------------
+
+function wrapText(ctx, text, maxWidth) {
+
+  const words = text.split(" ");
+  const lines = [];
+  let currentLine = "";
+
+  words.forEach(function (word) {
+
+    const testLine =
+      currentLine ? currentLine + " " + word : word;
+
+    const testWidth =
+      ctx.measureText(testLine).width;
+
+    if (testWidth > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
     } else {
-      alert("Image download करके WhatsApp/Instagram/Facebook पर share करें।");
+      currentLine = testLine;
     }
   });
-};
 
-const today = new Date().toISOString().slice(0,10);
-const allQuotes = Object.values(data).flat();
-document.getElementById("dailyQuote").textContent = allQuotes[
-  Math.abs(hash(today)) % allQuotes.length
-];
+  if (currentLine) {
+    lines.push(currentLine);
+  }
 
-function hash(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i)|0;return h;}
+  return lines;
+}
 
-let deferredPrompt;
-window.addEventListener("beforeinstallprompt",e=>{
-  e.preventDefault(); deferredPrompt=e;
-  document.getElementById("installBtn").hidden=false;
-});
-document.getElementById("installBtn").onclick=async()=>{
-  if(!deferredPrompt)return;
-  deferredPrompt.prompt();
-  deferredPrompt=null;
-};
 
-if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
-setRandomQuote();
+// ------------------------------------
+// Status image generate karo (canvas)
+// ------------------------------------
+
+async function generateStatus() {
+
+  if (!currentQuote) {
+
+    alert("पहले 'Get New Quote' दबाएं।");
+    return;
+  }
+
+  const button =
+    document.getElementById("generateStatusBtn");
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "⏳ Status बना रहा है...";
+  }
+
+  try {
+
+    const templateKey =
+      document.getElementById("templateStyle")?.value || "purple";
+
+    const colors =
+      TEMPLATE_COLORS[templateKey] || TEMPLATE_COLORS.purple;
+
+    const userName =
+      document.getElementById("userName")?.value.trim() || "";
+
+    const photoInput =
+      document.getElementById("photoInput");
+
+    const photoFile =
+      photoInput?.files?.[0] || null;
+
+
+    // ------------------------------------
+    // Canvas setup
+    // ------------------------------------
+
+    const canvas =
+      document.createElement("canvas");
+
+    canvas.width = 1080;
+    canvas.height = 1080;
+
+    const ctx =
+      canvas.getContext("2d");
+
+
+    // ------------------------------------
+    // Background gradient
+    // ------------------------------------
+
+    const gradient =
+      ctx.createLinearGradient(0, 0, 1080, 1080);
+
+    gradient.addColorStop(0, colors.from);
+    gradient.addColorStop(1, colors.to);
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1080, 1080);
+
+
+    // ------------------------------------
+    // Decorative quote mark
+    // ------------------------------------
+
+    ctx.fillStyle = colors.accent;
+    ctx.globalAlpha = 0.25;
+    ctx.font = "bold 220px Georgia";
+    ctx.fillText("\u201C", 60, 260);
+    ctx.globalAlpha = 1;
+
+
+    // ------------------------------------
+    // Quote text (wrapped, centered)
+    // ------------------------------------
+
+    ctx.fillStyle = colors.text;
+    ctx.textAlign = "center";
+    ctx.font = "italic 52px Georgia";
+
+    const maxTextWidth = 880;
+    const lines = wrapText(ctx, currentQuote, maxTextWidth);
+
+    const lineHeight = 68;
+    const totalTextHeight = lines.length * lineHeight;
+    let startY = (1080 - totalTextHeight) / 2;
+
+    // Photo/name jagah ke liye thoda upar shift karo
+    if (photoFile || userName) {
+      startY -= 60;
+    }
+
+    lines.forEach(function (line, i) {
+      ctx.fillText(line, 540, startY + (i * lineHeight));
+    });
+
+
+    // ------------------------------------
+    // Photo (circular) + Name
+    // ------------------------------------
+
+    const contentBottomY =
+      startY + (lines.length * lineHeight) + 60;
+
+    if (photoFile) {
+
+      const photoDataUrl =
+        await new Promise(function (resolve, reject) {
+
+          const reader = new FileReader();
+
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error("Photo read नहीं हो पाई।"));
+
+          reader.readAsDataURL(photoFile);
+        });
+
+      const img =
+        await new Promise(function (resolve, reject) {
+
+          const image = new Image();
+
+          image.onload = () => resolve(image);
+          image.onerror = () => reject(new Error("Photo load नहीं हो पाई।"));
+
+          image.src = photoDataUrl;
+        });
+
+      const circleRadius = 70;
+      const circleX = 540;
+      const circleY = contentBottomY + circleRadius;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+
+      // Photo ko square crop karke circle mein fit karo
+      const size = Math.min(img.width, img.height);
+      const sx = (img.width - size) / 2;
+      const sy = (img.height - size) / 2;
+
+      ctx.drawImage(
+        img,
+        sx, sy, size, size,
+        circleX - circleRadius, circleY - circleRadius,
+        circleRadius * 2, circleRadius * 2
+      );
+
+      ctx.restore();
+
+      ctx.strokeStyle = colors.accent;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      if (userName) {
+        ctx.font = "bold 32px Arial";
+        ctx.fillStyle = colors.text;
+        ctx.fillText(userName, 540, circleY + circleRadius + 45);
+      }
+
+    } else if (userName) {
+
+      ctx.font = "bold 34px Arial";
+      ctx.fillStyle = colors.accent;
+      ctx.fillText("— " + userName, 540, contentBottomY + 20);
+    }
+
+
+    // ------------------------------------
+    // Branding
+    // ------------------------------------
+
+    ctx.font = "24px Arial";
+    ctx.fillStyle = colors.text;
+    ctx.globalAlpha = 0.75;
+    ctx.fillText("✨ StatusCraft AI", 540, 1010);
+    ctx.globalAlpha = 1;
+
+
+    // ------------------------------------
+    // Result dikhao
+    // ------------------------------------
+
+    const imageUrl =
+      canvas.toDataURL("image/jpeg", 0.92);
+
+    const resultBox =
+      document.getElementById("statusResult");
+
+    const resultImg =
+      document.getElementById("generatedStatus");
+
+    if (resultImg) {
+      resultImg.src = imageUrl;
+    }
+
+    if (resultBox) {
+      resultBox.style.display = "block";
+    }
+
+
+    // ------------------------------------
+    // Download button
+    // ------------------------------------
+
+    const downloadBtn =
+      document.getElementById("downloadStatusBtn");
+
+    if (downloadBtn) {
+
+      downloadBtn.onclick = function () {
+
+        const link = document.createElement("a");
+        link.download = "StatusCraftAI-Status.jpg";
+        link.href = imageUrl;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      };
+    }
+
+
+    // ------------------------------------
+    // Share button
+    // ------------------------------------
+
+    const shareBtn =
+      document.getElementById("shareStatusBtn");
+
+    if (shareBtn) {
+
+      shareBtn.onclick = async function () {
+
+        try {
+
+          const blobResponse = await fetch(imageUrl);
+          const blob = await blobResponse.blob();
+
+          const file = new File(
+            [blob],
+            "StatusCraftAI-Status.jpg",
+            { type: "image/jpeg" }
+          );
+
+          if (
+            navigator.share &&
+            navigator.canShare &&
+            navigator.canShare({ files: [file] })
+          ) {
+
+            await navigator.share({
+              title: "StatusCraft AI",
+              text: currentQuote,
+              files: [file]
+            });
+
+          } else {
+
+            alert("इस browser में sharing उपलब्ध नहीं है। पहले Download करें।");
+          }
+
+        } catch (shareError) {
+
+          if (shareError.name !== "AbortError") {
+            alert("❌ Status share नहीं हो पाया।");
+          }
+        }
+      };
+    }
+
+
+  } catch (error) {
+
+    console.error("StatusCraft Generate Error:", error);
+
+    alert(
+      "❌ Status बनाने में समस्या हुई:\n\n" + error.message
+    );
+
+  } finally {
+
+    if (button) {
+      button.disabled = false;
+      button.textContent = "🖼️ Generate Status";
+    }
+  }
+}
+
+window.generateStatus = generateStatus;
