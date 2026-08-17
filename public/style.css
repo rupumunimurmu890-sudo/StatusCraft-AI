@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+body {
+  background: #faf5ec;
+  color: #2b241c;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 600px;
+  margin: auto;
+  background: #ffffff;
+  padding: 26px;
+  border-radius: 22px;
+  border: 1px solid #ece3d2;
+  box-shadow: 0 12px 40px rgba(43, 36, 28, .08);
+}
+
+h1 {
+  text-align: center;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 600;
+  font-size: 34px;
+  color: #1f6f54;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #8a7d68;
+  font-size: 15px;
+  margin-bottom: 24px;
+  letter-spacing: .3px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin: 16px 0 7px;
+  color: #4a4032;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #e2d8c3;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #2b241c;
+  background: #fdfaf4;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: #1f6f54;
+  box-shadow: 0 0 0 3px rgba(31, 111, 84, .12);
+}
+
+input::placeholder {
+  color: #b3a58c;
+}
+
+.upload {
+  min-height: 100px;
+  padding: 24px 16px;
+  text-align: center;
+  border: 2px dashed #c9a227;
+  border-radius: 14px;
+  cursor: pointer;
+  color: #8a7d68;
+  background: rgba(201, 162, 39, .06);
+  font-size: 14px;
+}
+
+.preview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  margin-top: 12px;
+  border-radius: 12px;
+  display: none;
+}
+
+button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  background: #1f6f54;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .15s;
+}
+
+button:hover {
+  background: #195a44;
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+#downloadStatusBtn {
+  background: #c9a227;
+}
+
+#downloadStatusBtn:hover {
+  background: #ab8a1f;
+}
+
+.quoteBox {
+  margin-top: 20px;
+  padding: 22px;
+  background: #fdfaf4;
+  border-left: 4px solid #1f6f54;
+  border-radius: 4px 14px 14px 4px;
+}
+
+.quoteBox p {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.6;
+  color: #2b241c;
+}
+
+.statusResult {
+  display: none;
+  margin-top: 24px;
+  text-align: center;
+}
+
+.statusResult img {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(43, 36, 28, .15);
+}
+
+.footer {
+  text-align: center;
+  margin-top: 22px;
+  color: #b3a58c;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+
+  body {
+    padding: 10px;
+  }
+
+  .app {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+}
