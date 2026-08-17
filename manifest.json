@@ -1,10 +1,18 @@
 {
-  "name": "Daily Status AI",
-  "short_name": "Daily Status",
-  "start_url": "./",
+  "name": "StatusCraft AI",
+  "short_name": "StatusCraft",
+  "description": "Beautiful daily quotes and status images in your language.",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f6f3ff",
-  "theme_color": "#6d28d9",
-  "description": "Daily Shayari, Quotes, Wishes and Status Images",
-  "icons": []
+  "background_color": "#faf5ec",
+  "theme_color": "#1f6f54",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
