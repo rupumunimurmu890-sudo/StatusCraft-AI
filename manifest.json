@@ -1,0 +1,10 @@
+{
+  "name": "Daily Status AI",
+  "short_name": "Daily Status",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f3ff",
+  "theme_color": "#6d28d9",
+  "description": "Daily Shayari, Quotes, Wishes and Status Images",
+  "icons": []
+}

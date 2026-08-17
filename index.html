@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6d28d9">
+  <meta name="description" content="Daily Status AI - रोज़ नए Shayari, Quotes, Wishes और आकर्षक Status Images बनाएं।">
+  <meta property="og:title" content="Daily Status AI">
+  <meta property="og:description" content="हर दिन नए Quotes, Shayari और आकर्षक Status Images।">
+  <title>Daily Status AI</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">✨</div>
+      <div>
+        <h1>Daily Status AI</h1>
+        <p>हर दिन नया Status</p>
+      </div>
+    </div>
+    <button id="installBtn" class="install-btn" hidden>📲 Install</button>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <span class="pill">🔥 Daily New Quotes</span>
+      <h2>अपना पसंदीदा Status बनाइए</h2>
+      <p>Shayari, Motivation, Love, Wishes और Spiritual Inspiration को सुंदर image में बदलें।</p>
+    </section>
+
+    <section class="categories" id="categories"></section>
+
+    <section class="creator-card">
+      <div class="section-title">
+        <div>
+          <h3>🎨 Create Your Status</h3>
+          <p>Quote चुनें, नाम लगाएँ और image बनाएं।</p>
+        </div>
+      </div>
+
+      <label>Category</label>
+      <select id="categorySelect"></select>
+
+      <label>Your Name <span>(optional)</span></label>
+      <input id="userName" type="text" maxlength="40" placeholder="जैसे: Santosh">
+
+      <label>Quote</label>
+      <textarea id="quoteInput" rows="4" maxlength="240" placeholder="अपना quote लिखें..."></textarea>
+
+      <div class="actions">
+        <button id="randomBtn" class="secondary">🎲 New Quote</button>
+        <button id="createBtn" class="primary">✨ Create Image</button>
+      </div>
+    </section>
+
+    <section class="preview-card">
+      <h3>🖼️ Preview</h3>
+      <canvas id="statusCanvas" width="1080" height="1920"></canvas>
+      <div class="actions">
+        <button id="downloadBtn" class="primary">📥 Download</button>
+        <button id="shareBtn" class="secondary">📤 Share</button>
+      </div>
+    </section>
+
+    <section class="daily-card">
+      <h3>🌟 Today's Inspiration</h3>
+      <div id="dailyQuote"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Daily Status AI • New inspiration every day</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
