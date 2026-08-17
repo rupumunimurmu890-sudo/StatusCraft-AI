@@ -1,79 +1,99 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#6d28d9">
-  <meta name="description" content="Daily Status AI - रोज़ नए Shayari, Quotes, Wishes और आकर्षक Status Images बनाएं।">
-  <meta property="og:title" content="Daily Status AI">
-  <meta property="og:description" content="हर दिन नए Quotes, Shayari और आकर्षक Status Images।">
-  <title>Daily Status AI</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#18004a">
+
+<title>StatusCraft AI - Status & Quote Creator</title>
+<meta name="description" content="Beautiful daily quotes and status images in your language — download and share in seconds.">
+
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">✨</div>
-      <div>
-        <h1>Daily Status AI</h1>
-        <p>हर दिन नया Status</p>
-      </div>
+
+  <div class="app">
+
+    <h1>✨ StatusCraft AI</h1>
+    <p class="subtitle">Beautiful Status, Every Day</p>
+
+    <label>🌍 Language</label>
+    <select id="language">
+      <option value="Hindi">Hindi (हिन्दी)</option>
+      <option value="English">English</option>
+      <option value="Hinglish">Hinglish</option>
+    </select>
+
+    <label>🗂️ Category</label>
+    <select id="category">
+      <option value="Motivational">💪 Motivational</option>
+      <option value="Love">❤️ Love</option>
+      <option value="Friendship">🤝 Friendship</option>
+      <option value="Good Morning">🌅 Good Morning</option>
+      <option value="Success">🏆 Success</option>
+    </select>
+
+    <label>🎨 Template Style</label>
+    <select id="templateStyle">
+      <option value="purple">💜 Purple Dream</option>
+      <option value="sunset">🌇 Sunset Glow</option>
+      <option value="ocean">🌊 Ocean Calm</option>
+      <option value="gold">✨ Golden Hour</option>
+    </select>
+
+    <button type="button" id="getQuoteBtn">
+      🎲 Get New Quote
+    </button>
+
+    <div id="quoteBox" class="quoteBox">
+      <p id="quoteText">Get New Quote दबाओ, आपका पहला status quote यहाँ दिखेगा।</p>
     </div>
-    <button id="installBtn" class="install-btn" hidden>📲 Install</button>
-  </header>
 
-  <main class="container">
-    <section class="hero">
-      <span class="pill">🔥 Daily New Quotes</span>
-      <h2>अपना पसंदीदा Status बनाइए</h2>
-      <p>Shayari, Motivation, Love, Wishes और Spiritual Inspiration को सुंदर image में बदलें।</p>
-    </section>
+    <label>🙋 Your Name (optional)</label>
+    <input type="text" id="userName" placeholder="Example: Rahul">
 
-    <section class="categories" id="categories"></section>
+    <label>📷 Your Photo (optional)</label>
+    <div class="upload" onclick="document.getElementById('photoInput').click()">
+      Tap to upload your photo
+    </div>
+    <input type="file" id="photoInput" accept="image/*" style="display:none">
+    <img id="photoPreview" class="preview">
 
-    <section class="creator-card">
-      <div class="section-title">
-        <div>
-          <h3>🎨 Create Your Status</h3>
-          <p>Quote चुनें, नाम लगाएँ और image बनाएं।</p>
-        </div>
-      </div>
+    <button type="button" id="generateStatusBtn">
+      🖼️ Generate Status
+    </button>
 
-      <label>Category</label>
-      <select id="categorySelect"></select>
+    <div id="statusResult" class="statusResult">
+      <img id="generatedStatus" alt="Generated Status">
 
-      <label>Your Name <span>(optional)</span></label>
-      <input id="userName" type="text" maxlength="40" placeholder="जैसे: Santosh">
+      <button type="button" id="downloadStatusBtn">
+        📥 Download Status
+      </button>
 
-      <label>Quote</label>
-      <textarea id="quoteInput" rows="4" maxlength="240" placeholder="अपना quote लिखें..."></textarea>
+      <button type="button" id="shareStatusBtn">
+        📤 Share Status
+      </button>
+    </div>
 
-      <div class="actions">
-        <button id="randomBtn" class="secondary">🎲 New Quote</button>
-        <button id="createBtn" class="primary">✨ Create Image</button>
-      </div>
-    </section>
+  </div>
 
-    <section class="preview-card">
-      <h3>🖼️ Preview</h3>
-      <canvas id="statusCanvas" width="1080" height="1920"></canvas>
-      <div class="actions">
-        <button id="downloadBtn" class="primary">📥 Download</button>
-        <button id="shareBtn" class="secondary">📤 Share</button>
-      </div>
-    </section>
-
-    <section class="daily-card">
-      <h3>🌟 Today's Inspiration</h3>
-      <div id="dailyQuote"></div>
-    </section>
-  </main>
-
-  <footer>
-    <p>Daily Status AI • New inspiration every day</p>
-  </footer>
+  <p class="footer">
+    ✨ StatusCraft AI<br>
+    © 2026
+  </p>
 
   <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("sw.js").catch(function (err) {
+          console.error("Service worker registration failed:", err);
+        });
+      });
+    }
+  </script>
+
 </body>
 </html>
