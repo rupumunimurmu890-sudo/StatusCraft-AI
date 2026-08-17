@@ -4,6 +4,7 @@
 
 let QUOTES_DATA = {};
 let currentQuote = "";
+let generatedImageUrl = "";
 
 // ------------------------------------
 // Quotes data load karo
@@ -80,7 +81,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
   // ------------------------------------
-  // Photo preview
+  // 🆕 Photo upload card (preview + remove)
   // ------------------------------------
 
   const photoInput =
@@ -89,6 +90,12 @@ document.addEventListener("DOMContentLoaded", async function () {
   const photoPreview =
     document.getElementById("photoPreview");
 
+  const uploadCard =
+    document.getElementById("uploadCard");
+
+  const removePhotoBtn =
+    document.getElementById("removePhotoBtn");
+
   if (photoInput) {
 
     photoInput.addEventListener("change", function () {
@@ -96,15 +103,34 @@ document.addEventListener("DOMContentLoaded", async function () {
       const file = this.files[0];
 
       if (file && photoPreview) {
+
         photoPreview.src = URL.createObjectURL(file);
-        photoPreview.style.display = "block";
+
+        if (uploadCard) {
+          uploadCard.classList.add("hasPhoto");
+        }
+      }
+    });
+  }
+
+  if (removePhotoBtn) {
+
+    removePhotoBtn.addEventListener("click", function (e) {
+
+      e.stopPropagation();
+
+      if (photoInput) photoInput.value = "";
+      if (photoPreview) photoPreview.src = "";
+
+      if (uploadCard) {
+        uploadCard.classList.remove("hasPhoto");
       }
     });
   }
 
 
   // ------------------------------------
-  // Generate Status
+  // Create My Status
   // ------------------------------------
 
   const generateBtn =
@@ -113,6 +139,50 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (generateBtn) {
 
     generateBtn.addEventListener("click", generateStatus);
+  }
+
+
+  // ------------------------------------
+  // 🆕 Create Another (reset result view)
+  // ------------------------------------
+
+  const createAnotherBtn =
+    document.getElementById("createAnotherBtn");
+
+  if (createAnotherBtn) {
+
+    createAnotherBtn.addEventListener("click", function () {
+
+      const resultActions =
+        document.getElementById("resultActions");
+
+      const previewPlaceholder =
+        document.getElementById("previewPlaceholder");
+
+      const generatedStatus =
+        document.getElementById("generatedStatus");
+
+      if (resultActions) {
+        resultActions.classList.remove("show");
+      }
+
+      if (generatedStatus) {
+        generatedStatus.style.display = "none";
+        generatedStatus.src = "";
+      }
+
+      if (previewPlaceholder) {
+        previewPlaceholder.style.display = "flex";
+      }
+
+      currentQuote = getRandomQuote();
+
+      if (quoteText) {
+        quoteText.textContent = currentQuote;
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   }
 
 });
@@ -197,16 +267,20 @@ async function generateStatus() {
 
   if (!currentQuote) {
 
-    alert("पहले 'Get New Quote' दबाएं।");
+    alert("पहले 'Generate Quote' दबाएं।");
     return;
   }
 
   const button =
     document.getElementById("generateStatusBtn");
 
+  const originalButtonHtml =
+    button ? button.innerHTML : "";
+
   if (button) {
     button.disabled = true;
-    button.textContent = "⏳ Status बना रहा है...";
+    button.innerHTML =
+      '<span class="spinner"></span> Status बना रहा है...';
   }
 
   try {
@@ -242,7 +316,7 @@ async function generateStatus() {
 
 
     // ------------------------------------
-    // 🆕 Background — pehle AI se quote-matching
+    // Background — pehle AI se quote-matching
     // photo try karo, fail ho toh gradient fallback
     // ------------------------------------
 
@@ -251,7 +325,8 @@ async function generateStatus() {
     try {
 
       if (button) {
-        button.textContent = "⏳ AI matching photo बना रहा है...";
+        button.innerHTML =
+          '<span class="spinner"></span> AI matching photo बना रहा है...';
       }
 
       const category =
@@ -324,7 +399,8 @@ async function generateStatus() {
     }
 
     if (button) {
-      button.textContent = "⏳ Status बना रहा है...";
+      button.innerHTML =
+        '<span class="spinner"></span> Status बना रहा है...';
     }
 
     if (!backgroundDrawn) {
@@ -463,95 +539,48 @@ async function generateStatus() {
 
 
     // ------------------------------------
-    // Result dikhao
+    // Result dikhao (preview panel mein)
     // ------------------------------------
 
-    const imageUrl =
+    generatedImageUrl =
       canvas.toDataURL("image/jpeg", 0.92);
 
-    const resultBox =
-      document.getElementById("statusResult");
+    const previewPlaceholder =
+      document.getElementById("previewPlaceholder");
 
     const resultImg =
       document.getElementById("generatedStatus");
 
+    const resultActions =
+      document.getElementById("resultActions");
+
     if (resultImg) {
-      resultImg.src = imageUrl;
+      resultImg.src = generatedImageUrl;
+      resultImg.style.display = "block";
     }
 
-    if (resultBox) {
-      resultBox.style.display = "block";
+    if (previewPlaceholder) {
+      previewPlaceholder.style.display = "none";
     }
 
+    if (resultActions) {
+      resultActions.classList.add("show");
+    }
 
-    // ------------------------------------
-    // Download button
-    // ------------------------------------
+    // Preview panel tak smooth scroll (mobile par especially useful)
+    const previewFrame =
+      document.getElementById("previewFrame");
 
-    const downloadBtn =
-      document.getElementById("downloadStatusBtn");
-
-    if (downloadBtn) {
-
-      downloadBtn.onclick = function () {
-
-        const link = document.createElement("a");
-        link.download = "StatusCraftAI-Status.jpg";
-        link.href = imageUrl;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      };
+    if (previewFrame && window.innerWidth < 900) {
+      previewFrame.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
 
     // ------------------------------------
-    // Share button
+    // Download + Share buttons wire karo
     // ------------------------------------
 
-    const shareBtn =
-      document.getElementById("shareStatusBtn");
-
-    if (shareBtn) {
-
-      shareBtn.onclick = async function () {
-
-        try {
-
-          const blobResponse = await fetch(imageUrl);
-          const blob = await blobResponse.blob();
-
-          const file = new File(
-            [blob],
-            "StatusCraftAI-Status.jpg",
-            { type: "image/jpeg" }
-          );
-
-          if (
-            navigator.share &&
-            navigator.canShare &&
-            navigator.canShare({ files: [file] })
-          ) {
-
-            await navigator.share({
-              title: "StatusCraft AI",
-              text: currentQuote,
-              files: [file]
-            });
-
-          } else {
-
-            alert("इस browser में sharing उपलब्ध नहीं है। पहले Download करें।");
-          }
-
-        } catch (shareError) {
-
-          if (shareError.name !== "AbortError") {
-            alert("❌ Status share नहीं हो पाया।");
-          }
-        }
-      };
-    }
+    setupResultActions();
 
 
   } catch (error) {
@@ -566,9 +595,94 @@ async function generateStatus() {
 
     if (button) {
       button.disabled = false;
-      button.textContent = "🖼️ Generate Status";
+      button.innerHTML = originalButtonHtml;
     }
   }
 }
 
 window.generateStatus = generateStatus;
+
+
+// ------------------------------------
+// 🆕 Download + Share button wiring
+// (WhatsApp/Instagram/Facebook/Telegram sab
+// same native share sheet kholte hain — jaha
+// user apna target app khud choose karta hai,
+// kyunki browser se seedha kisi specific app
+// mein image bhejna technically possible nahi)
+// ------------------------------------
+
+function setupResultActions() {
+
+  const downloadBtn =
+    document.getElementById("downloadStatusBtn");
+
+  if (downloadBtn) {
+
+    downloadBtn.onclick = function () {
+
+      const link = document.createElement("a");
+      link.download = "StatusCraftAI-Status.jpg";
+      link.href = generatedImageUrl;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    };
+  }
+
+
+  async function shareStatus() {
+
+    try {
+
+      const blobResponse = await fetch(generatedImageUrl);
+      const blob = await blobResponse.blob();
+
+      const file = new File(
+        [blob],
+        "StatusCraftAI-Status.jpg",
+        { type: "image/jpeg" }
+      );
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })
+      ) {
+
+        await navigator.share({
+          title: "StatusCraft AI",
+          text: currentQuote,
+          files: [file]
+        });
+
+      } else {
+
+        alert("इस browser में sharing उपलब्ध नहीं है। पहले Download करें।");
+      }
+
+    } catch (shareError) {
+
+      if (shareError.name !== "AbortError") {
+        alert("❌ Status share नहीं हो पाया।");
+      }
+    }
+  }
+
+  [
+    "shareStatusBtn",
+    "whatsappBtn",
+    "instagramBtn",
+    "facebookBtn",
+    "telegramBtn"
+  ].forEach(function (id) {
+
+    const btn = document.getElementById(id);
+
+    if (btn) {
+      btn.onclick = shareStatus;
+    }
+  });
+}
+
+window.setupResultActions = setupResultActions;
