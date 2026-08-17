@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#18004a">
+
+<title>StatusCraft AI - Status & Quote Creator</title>
+<meta name="description" content="Beautiful daily quotes and status images in your language — download and share in seconds.">
+
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="app">
+
+    <h1>✨ StatusCraft AI</h1>
+    <p class="subtitle">Beautiful Status, Every Day</p>
+
+    <label>🌍 Language</label>
+    <select id="language">
+      <option value="Hindi">Hindi (हिन्दी)</option>
+      <option value="English">English</option>
+      <option value="Hinglish">Hinglish</option>
+    </select>
+
+    <label>🗂️ Category</label>
+    <select id="category">
+      <option value="Motivational">💪 Motivational</option>
+      <option value="Love">❤️ Love</option>
+      <option value="Friendship">🤝 Friendship</option>
+      <option value="Good Morning">🌅 Good Morning</option>
+      <option value="Success">🏆 Success</option>
+    </select>
+
+    <label>🎨 Template Style</label>
+    <select id="templateStyle">
+      <option value="purple">💜 Purple Dream</option>
+      <option value="sunset">🌇 Sunset Glow</option>
+      <option value="ocean">🌊 Ocean Calm</option>
+      <option value="gold">✨ Golden Hour</option>
+    </select>
+
+    <button type="button" id="getQuoteBtn">
+      🎲 Get New Quote
+    </button>
+
+    <div id="quoteBox" class="quoteBox">
+      <p id="quoteText">Get New Quote दबाओ, आपका पहला status quote यहाँ दिखेगा।</p>
+    </div>
+
+    <label>🙋 Your Name (optional)</label>
+    <input type="text" id="userName" placeholder="Example: Rahul">
+
+    <label>📷 Your Photo (optional)</label>
+    <div class="upload" onclick="document.getElementById('photoInput').click()">
+      Tap to upload your photo
+    </div>
+    <input type="file" id="photoInput" accept="image/*" style="display:none">
+    <img id="photoPreview" class="preview">
+
+    <button type="button" id="generateStatusBtn">
+      🖼️ Generate Status
+    </button>
+
+    <div id="statusResult" class="statusResult">
+      <img id="generatedStatus" alt="Generated Status">
+
+      <button type="button" id="downloadStatusBtn">
+        📥 Download Status
+      </button>
+
+      <button type="button" id="shareStatusBtn">
+        📤 Share Status
+      </button>
+    </div>
+
+  </div>
+
+  <p class="footer">
+    ✨ StatusCraft AI<br>
+    © 2026
+  </p>
+
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("sw.js").catch(function (err) {
+          console.error("Service worker registration failed:", err);
+        });
+      });
+    }
+  </script>
+
+</body>
+</html>
