@@ -5,11 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1f6f54">
 
-<title>StatusCraft AI - Status & Quote Creator</title>
-<meta name="description" content="Beautiful daily quotes and status images in your language — download and share in seconds.">
+<title>StatusCraft AI - Free AI Status & Shayari Maker in Hindi, English</title>
+<meta name="description" content="Create beautiful AI-generated daily quotes, shayari and status images in Hindi, English & Hinglish — add your photo, download or share instantly, free.">
+<meta name="keywords" content="status maker, shayari status, hindi status, AI quote generator, love status, motivational status, good morning status, whatsapp status maker">
+<link rel="canonical" href="https://statuscraft-ai.rupumunimurmu890.workers.dev/">
+
+<!-- Open Graph (WhatsApp / Facebook / Instagram preview) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="StatusCraft AI - Free AI Status & Shayari Maker">
+<meta property="og:description" content="Create beautiful AI-generated daily quotes, shayari and status images in Hindi, English & Hinglish — add your photo, download or share instantly, free.">
+<meta property="og:url" content="https://statuscraft-ai.rupumunimurmu890.workers.dev/">
+<meta property="og:image" content="https://statuscraft-ai.rupumunimurmu890.workers.dev/icon.svg">
+<meta property="og:locale" content="hi_IN">
+
+<!-- Twitter card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="StatusCraft AI - Free AI Status & Shayari Maker">
+<meta name="twitter:description" content="Create beautiful AI-generated daily quotes, shayari and status images in Hindi, English & Hinglish — free, in seconds.">
+<meta name="twitter:image" content="https://statuscraft-ai.rupumunimurmu890.workers.dev/icon.svg">
+
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
+<style>
+  .topBar { display: flex; align-items: center; justify-content: space-between; }
+  .installBtn {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 999px;
+    background: #1f6f54;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .installBtn:hover { background: #17573f; }
+</style>
 </head>
 
 <body>
@@ -26,6 +61,11 @@
         <div class="brandTag">Beautiful Status. Every Feeling.</div>
       </div>
     </div>
+
+    <button type="button" id="installAppBtn" class="installBtn" style="display:none;">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+      Install App
+    </button>
   </header>
 
   <main class="layout">
@@ -44,6 +84,27 @@
             <option value="Hindi">Hindi (हिन्दी)</option>
             <option value="English">English</option>
             <option value="Hinglish">Hinglish</option>
+            <option value="Bengali">Bengali (বাংলা)</option>
+            <option value="Marathi">Marathi (मराठी)</option>
+            <option value="Gujarati">Gujarati (ગુજરાતી)</option>
+            <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+            <option value="Tamil">Tamil (தமிழ்)</option>
+            <option value="Telugu">Telugu (తెలుగు)</option>
+            <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
+            <option value="Malayalam">Malayalam (മലയാളം)</option>
+            <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
+            <option value="Assamese">Assamese (অসমীয়া)</option>
+            <option value="Urdu">Urdu (اردو)</option>
+            <option value="Nepali">Nepali (नेपाली)</option>
+            <option value="Sanskrit">Sanskrit (संस्कृत)</option>
+            <option value="Maithili">Maithili (मैथिली)</option>
+            <option value="Konkani">Konkani (कोंकणी)</option>
+            <option value="Kashmiri">Kashmiri (कॉशुर)</option>
+            <option value="Sindhi">Sindhi (سنڌي)</option>
+            <option value="Dogri">Dogri (डोगरी)</option>
+            <option value="Bodo">Bodo (बड़ो)</option>
+            <option value="Santali">Santali (ᱥᱟᱱᱛᱟᱲᱤ)</option>
+            <option value="Manipuri">Manipuri (মৈতৈলোন্)</option>
           </select>
         </div>
 
@@ -190,6 +251,55 @@
         });
       });
     }
+
+    // ------------------------------------
+    // 🆕 Install App button (PWA install prompt)
+    // ------------------------------------
+
+    let deferredInstallPrompt = null;
+
+    const installBtn = document.getElementById("installAppBtn");
+
+    window.addEventListener("beforeinstallprompt", function (event) {
+
+      // Browser ka default mini-infobar rokte hain,
+      // apna custom button dikhayenge
+      event.preventDefault();
+
+      deferredInstallPrompt = event;
+
+      if (installBtn) {
+        installBtn.style.display = "inline-flex";
+      }
+    });
+
+    if (installBtn) {
+
+      installBtn.addEventListener("click", async function () {
+
+        if (!deferredInstallPrompt) return;
+
+        deferredInstallPrompt.prompt();
+
+        const choice = await deferredInstallPrompt.userChoice;
+
+        // Ek baar prompt use ho gaya, dobara use nahi ho sakta
+        deferredInstallPrompt = null;
+        installBtn.style.display = "none";
+
+        console.log("Install choice:", choice.outcome);
+      });
+    }
+
+    // App already install ho chuka ho toh button hi mat dikhao
+    window.addEventListener("appinstalled", function () {
+
+      if (installBtn) {
+        installBtn.style.display = "none";
+      }
+
+      deferredInstallPrompt = null;
+    });
   </script>
 
 </body>
