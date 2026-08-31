@@ -73,7 +73,8 @@ ${feelingLine}
 
 RULES:
 - Output ONLY the quote text itself. No preamble, no explanation, no quotation marks, no author name.
-- Keep it short enough for a mobile status image (max 2 lines / ~25 words).
+- Include 1-2 relevant emoji that match the mood/theme (e.g. ❤️ for love, 💪 for motivational, 🙏 for spiritual, ☀️ for good morning) — place them naturally at the start or end of the quote, not scattered randomly.
+- Keep it short enough for a mobile status image (max 2 lines / ~25 words), emoji included.
 - Do NOT attribute it to any real person — this must be an original line.
 - If the language is Hindi, write it in Devanagari script.
 - If the language is Hinglish, write Hindi words using English/Roman letters.
