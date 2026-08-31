@@ -108,8 +108,9 @@ RULES:
 - Keep it short enough for a mobile status image (max 2 lines / ~25 words), emoji included.
 - Do NOT attribute it to any real person — this must be an original line.
 - Do NOT reuse common, overused, cliché quotes — make it feel fresh and specific.
-- If the language is Hindi, write it in Devanagari script.
-- If the language is Hinglish, write Hindi words using English/Roman letters.
+- Write the quote in the NATIVE SCRIPT of the specified language (for example: Devanagari for Hindi/Marathi/Nepali/Sanskrit/Konkani/Maithili/Dogri/Bodo, Bengali script for Bengali/Assamese, Gurmukhi for Punjabi, Gujarati script for Gujarati, Tamil script for Tamil, Telugu script for Telugu, Kannada script for Kannada, Malayalam script for Malayalam, Odia script for Odia, Perso-Arabic script for Urdu/Sindhi/Kashmiri, Ol Chiki for Santali, Meitei Mayek or Bengali script for Manipuri).
+- Exception: if the language is exactly "Hinglish", write Hindi words using Roman/English letters instead of Devanagari.
+- If you are not fully confident in a requested language's script, still write a warm, correct quote in that language using its most commonly used script, rather than falling back to Hindi or English.
 - Make it feel warm, human, and fresh — avoid generic clichés.
 `;
 
