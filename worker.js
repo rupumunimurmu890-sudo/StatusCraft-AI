@@ -63,6 +63,35 @@ export default {
           ? `The user currently feels: "${feeling}". Let this subtly shape the quote's tone.`
           : "";
 
+        // ------------------------------------
+        // 🎲 Random style angle — har request pe
+        // alag style force karo taaki quotes
+        // baar-baar repeat/similar na lagein
+        // ------------------------------------
+
+        const STYLE_VARIATIONS = [
+          "Write it as a short, punchy one-liner.",
+          "Write it as a two-line poetic shayari with a natural rhythm.",
+          "Write it as a gentle, reflective thought.",
+          "Write it as a bold, energetic statement.",
+          "Write it using a nature or seasons metaphor.",
+          "Write it using a light/journey/path metaphor.",
+          "Write it as a heartfelt, conversational line, like talking to a close friend.",
+          "Write it with a subtle rhyme or wordplay.",
+          "Write it as a simple, everyday-life observation with deep meaning.",
+          "Write it as an uplifting message someone would send at sunrise."
+        ];
+
+        const randomStyle =
+          STYLE_VARIATIONS[
+            Math.floor(Math.random() * STYLE_VARIATIONS.length)
+          ];
+
+        // Randomness seed — model ko har baar naya context
+        // dikhta hai, isse cache-jaisa repeat kam hota hai
+        const randomSeed =
+          Math.random().toString(36).slice(2, 10);
+
         const prompt = `
 You are a quote-writing assistant for a status/shayari app called StatusCraft AI.
 
@@ -70,12 +99,15 @@ Write ONE original, short, emotionally resonant quote in ${language}.
 
 Category / theme: ${category}
 ${feelingLine}
+Style for this one: ${randomStyle}
+(variation id: ${randomSeed} — use this only to ensure freshness, do not mention it)
 
 RULES:
 - Output ONLY the quote text itself. No preamble, no explanation, no quotation marks, no author name.
 - Include 1-2 relevant emoji that match the mood/theme (e.g. ❤️ for love, 💪 for motivational, 🙏 for spiritual, ☀️ for good morning) — place them naturally at the start or end of the quote, not scattered randomly.
 - Keep it short enough for a mobile status image (max 2 lines / ~25 words), emoji included.
 - Do NOT attribute it to any real person — this must be an original line.
+- Do NOT reuse common, overused, cliché quotes — make it feel fresh and specific.
 - If the language is Hindi, write it in Devanagari script.
 - If the language is Hinglish, write Hindi words using English/Roman letters.
 - Make it feel warm, human, and fresh — avoid generic clichés.
@@ -91,7 +123,8 @@ RULES:
             messages: [
               { role: "user", content: prompt }
             ],
-            max_tokens: 120
+            max_tokens: 120,
+            temperature: 1.3
           }
         );
 
