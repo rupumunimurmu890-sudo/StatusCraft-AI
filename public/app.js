@@ -1,4 +1,4 @@
- // ========================================
+// ========================================
 // StatusCraft AI - Main JavaScript (Phase 2)
 // ========================================
 
@@ -385,86 +385,151 @@ async function generateStatus() {
 
 
     // ------------------------------------
-    // Background — pehle AI se quote-matching
-    // photo try karo, fail ho toh gradient fallback
+    // Background priority:
+    // 1) User ki apni uploaded photo (full frame)
+    // 2) AI-generated matching photo
+    // 3) Gradient fallback
     // ------------------------------------
 
     let backgroundDrawn = false;
 
-    try {
+    // Cover-fit drawing helper — image ko poore canvas
+    // mein bina squeeze/stretch kiye fill karta hai
+    function drawImageCover(image) {
 
-      if (button) {
-        button.innerHTML =
-          '<span class="spinner"></span> AI matching photo बना रहा है...';
+      const imgRatio = image.width / image.height;
+      const canvasRatio = 1080 / 1080;
+
+      let drawWidth, drawHeight, drawX, drawY;
+
+      if (imgRatio > canvasRatio) {
+        drawHeight = 1080;
+        drawWidth = 1080 * imgRatio;
+        drawX = (1080 - drawWidth) / 2;
+        drawY = 0;
+      } else {
+        drawWidth = 1080;
+        drawHeight = 1080 / imgRatio;
+        drawX = 0;
+        drawY = (1080 - drawHeight) / 2;
       }
 
-      const category =
-        document.getElementById("category")?.value || "";
+      ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    }
 
-      const bgResponse = await fetch(
-        "/api/generate-quote-background",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            quote: currentQuote,
-            category
-          })
-        }
-      );
+    if (photoFile) {
 
-      const bgData = await bgResponse.json();
+      // ---- 1) User ki apni photo ko full-frame background banao ----
 
-      if (
-        bgResponse.ok &&
-        bgData.success &&
-        bgData.image
-      ) {
+      try {
 
-        const bgImage =
+        const photoDataUrl =
+          await new Promise(function (resolve, reject) {
+
+            const reader = new FileReader();
+
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () =>
+              reject(new Error("Photo read नहीं हो पाई।"));
+
+            reader.readAsDataURL(photoFile);
+          });
+
+        const userImage =
           await new Promise(function (resolve, reject) {
 
             const image = new Image();
 
             image.onload = () => resolve(image);
             image.onerror = () =>
-              reject(new Error("AI background load नहीं हो पाई।"));
+              reject(new Error("Photo load नहीं हो पाई।"));
 
-            image.src = bgData.image;
+            image.src = photoDataUrl;
           });
 
-        // Photo ko cover-fit karke poore canvas mein draw karo
-        const imgRatio = bgImage.width / bgImage.height;
-        const canvasRatio = 1080 / 1080;
+        drawImageCover(userImage);
 
-        let drawWidth, drawHeight, drawX, drawY;
+        // Text readable rakhne ke liye dark gradient overlay
+        // (upar halka, neeche zyada dark — jaha text hoga)
+        const overlay =
+          ctx.createLinearGradient(0, 0, 0, 1080);
 
-        if (imgRatio > canvasRatio) {
-          drawHeight = 1080;
-          drawWidth = 1080 * imgRatio;
-          drawX = (1080 - drawWidth) / 2;
-          drawY = 0;
-        } else {
-          drawWidth = 1080;
-          drawHeight = 1080 / imgRatio;
-          drawX = 0;
-          drawY = (1080 - drawHeight) / 2;
-        }
+        overlay.addColorStop(0, "rgba(0,0,0,0.45)");
+        overlay.addColorStop(0.5, "rgba(0,0,0,0.35)");
+        overlay.addColorStop(1, "rgba(0,0,0,0.55)");
 
-        ctx.drawImage(bgImage, drawX, drawY, drawWidth, drawHeight);
-
-        // Text readable rakhne ke liye halka dark overlay
-        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fillStyle = overlay;
         ctx.fillRect(0, 0, 1080, 1080);
 
         backgroundDrawn = true;
+
+      } catch (photoError) {
+
+        console.error("StatusCraft Photo Background Error:", photoError);
       }
+    }
 
-    } catch (bgError) {
+    if (!backgroundDrawn) {
 
-      console.error("StatusCraft Background Error:", bgError);
+      // ---- 2) AI se quote-matching background try karo ----
+
+      try {
+
+        if (button) {
+          button.innerHTML =
+            '<span class="spinner"></span> AI matching photo बना रहा है...';
+        }
+
+        const category =
+          document.getElementById("category")?.value || "";
+
+        const bgResponse = await fetch(
+          "/api/generate-quote-background",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              quote: currentQuote,
+              category
+            })
+          }
+        );
+
+        const bgData = await bgResponse.json();
+
+        if (
+          bgResponse.ok &&
+          bgData.success &&
+          bgData.image
+        ) {
+
+          const bgImage =
+            await new Promise(function (resolve, reject) {
+
+              const image = new Image();
+
+              image.onload = () => resolve(image);
+              image.onerror = () =>
+                reject(new Error("AI background load नहीं हो पाई।"));
+
+              image.src = bgData.image;
+            });
+
+          drawImageCover(bgImage);
+
+          // Text readable rakhne ke liye halka dark overlay
+          ctx.fillStyle = "rgba(0,0,0,0.35)";
+          ctx.fillRect(0, 0, 1080, 1080);
+
+          backgroundDrawn = true;
+        }
+
+      } catch (bgError) {
+
+        console.error("StatusCraft Background Error:", bgError);
+      }
     }
 
     if (button) {
@@ -473,6 +538,8 @@ async function generateStatus() {
     }
 
     if (!backgroundDrawn) {
+
+      // ---- 3) Gradient fallback ----
 
       const gradient =
         ctx.createLinearGradient(0, 0, 1080, 1080);
@@ -502,7 +569,13 @@ async function generateStatus() {
 
     ctx.fillStyle = colors.text;
     ctx.textAlign = "center";
-    ctx.font = "italic 52px Georgia";
+    ctx.font = "bold 56px Georgia";
+
+    // Text ke peeche halka shadow — full-photo background par
+    // bhi bold shayari saaf padhi jaye
+    ctx.shadowColor = "rgba(0,0,0,0.6)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 2;
 
     const maxTextWidth = 880;
     const lines = wrapText(ctx, currentQuote, maxTextWidth);
@@ -520,79 +593,29 @@ async function generateStatus() {
       ctx.fillText(line, 540, startY + (i * lineHeight));
     });
 
+    // Shadow reset — neeche ke elements (name) par asar na ho
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
 
     // ------------------------------------
-    // Photo (circular) + Name
+    // Name (photo ab full-frame background hai,
+    // isliye chhota circle nahi dikhana — sirf naam)
     // ------------------------------------
 
-    const contentBottomY =
-      startY + (lines.length * lineHeight) + 60;
+    if (userName) {
 
-    if (photoFile) {
-
-      const photoDataUrl =
-        await new Promise(function (resolve, reject) {
-
-          const reader = new FileReader();
-
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = () => reject(new Error("Photo read नहीं हो पाई।"));
-
-          reader.readAsDataURL(photoFile);
-        });
-
-      const img =
-        await new Promise(function (resolve, reject) {
-
-          const image = new Image();
-
-          image.onload = () => resolve(image);
-          image.onerror = () => reject(new Error("Photo load नहीं हो पाई।"));
-
-          image.src = photoDataUrl;
-        });
-
-      const circleRadius = 70;
-      const circleX = 540;
-      const circleY = contentBottomY + circleRadius;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
-      ctx.closePath();
-      ctx.clip();
-
-      // Photo ko square crop karke circle mein fit karo
-      const size = Math.min(img.width, img.height);
-      const sx = (img.width - size) / 2;
-      const sy = (img.height - size) / 2;
-
-      ctx.drawImage(
-        img,
-        sx, sy, size, size,
-        circleX - circleRadius, circleY - circleRadius,
-        circleRadius * 2, circleRadius * 2
-      );
-
-      ctx.restore();
-
-      ctx.strokeStyle = colors.accent;
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
-      ctx.stroke();
-
-      if (userName) {
-        ctx.font = "bold 32px Arial";
-        ctx.fillStyle = colors.text;
-        ctx.fillText(userName, 540, circleY + circleRadius + 45);
-      }
-
-    } else if (userName) {
+      const contentBottomY =
+        startY + (lines.length * lineHeight) + 50;
 
       ctx.font = "bold 34px Arial";
       ctx.fillStyle = colors.accent;
-      ctx.fillText("— " + userName, 540, contentBottomY + 20);
+      ctx.shadowColor = "rgba(0,0,0,0.6)";
+      ctx.shadowBlur = 8;
+      ctx.fillText("— " + userName, 540, contentBottomY);
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
     }
 
 
