@@ -1,5 +1,5 @@
-// ========================================
-// StatusCraft AI - Main JavaScript (Phase 1)
+ // ========================================
+// StatusCraft AI - Main JavaScript (Phase 2)
 // ========================================
 
 let QUOTES_DATA = {};
@@ -7,7 +7,7 @@ let currentQuote = "";
 let generatedImageUrl = "";
 
 // ------------------------------------
-// Quotes data load karo
+// Quotes data load karo (fallback ke liye)
 // ------------------------------------
 
 async function loadQuotes() {
@@ -25,7 +25,7 @@ async function loadQuotes() {
 
 
 // ------------------------------------
-// Random quote nikalo category + language se
+// Static fallback quote (JSON se)
 // ------------------------------------
 
 function getRandomQuote() {
@@ -50,6 +50,58 @@ function getRandomQuote() {
 }
 
 
+// ------------------------------------
+// 🆕 AI quote — worker ke /api/generate-quote se
+// ------------------------------------
+
+async function fetchAIQuote() {
+
+  const category =
+    document.getElementById("category")?.value || "Motivational";
+
+  const language =
+    document.getElementById("language")?.value || "Hindi";
+
+  const response = await fetch("/api/generate-quote", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      language,
+      category
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success || !data.quote) {
+    throw new Error(data?.error || "AI quote नहीं मिली।");
+  }
+
+  return data.quote;
+}
+
+
+// ------------------------------------
+// 🆕 AI try karo, fail ho toh static fallback
+// ------------------------------------
+
+async function getNewQuote() {
+
+  try {
+
+    return await fetchAIQuote();
+
+  } catch (error) {
+
+    console.error("AI quote error, falling back:", error);
+
+    return getRandomQuote();
+  }
+}
+
+
 document.addEventListener("DOMContentLoaded", async function () {
 
   await loadQuotes();
@@ -62,17 +114,30 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   if (getQuoteBtn) {
 
-    getQuoteBtn.addEventListener("click", function () {
+    getQuoteBtn.addEventListener("click", async function () {
 
-      currentQuote = getRandomQuote();
+      const originalHtml = getQuoteBtn.innerHTML;
+
+      getQuoteBtn.disabled = true;
+      getQuoteBtn.innerHTML =
+        '<span class="spinner"></span> Quote बना रहा है...';
+
+      if (quoteText) {
+        quoteText.textContent = "...";
+      }
+
+      currentQuote = await getNewQuote();
 
       if (quoteText) {
         quoteText.textContent = currentQuote;
       }
+
+      getQuoteBtn.disabled = false;
+      getQuoteBtn.innerHTML = originalHtml;
     });
   }
 
-  // Pehli quote load hote hi dikha do
+  // Pehli quote — static (turant dikhe, AI ka wait na karna pade)
   currentQuote = getRandomQuote();
 
   if (quoteText) {
@@ -151,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   if (createAnotherBtn) {
 
-    createAnotherBtn.addEventListener("click", function () {
+    createAnotherBtn.addEventListener("click", async function () {
 
       const resultActions =
         document.getElementById("resultActions");
@@ -175,7 +240,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         previewPlaceholder.style.display = "flex";
       }
 
-      currentQuote = getRandomQuote();
+      if (quoteText) {
+        quoteText.textContent = "...";
+      }
+
+      currentQuote = await getNewQuote();
 
       if (quoteText) {
         quoteText.textContent = currentQuote;
