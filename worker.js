@@ -18,6 +18,135 @@ export default {
     }
 
     // ========================================
+    // 📝 AI QUOTE GENERATION (NEW - Phase 2)
+    // ========================================
+
+    if (
+      url.pathname === "/api/generate-quote" &&
+      request.method === "POST"
+    ) {
+
+      try {
+
+        const body = await request.json();
+
+        const {
+          language,   // e.g. "Hindi", "English", "Hinglish"
+          category,   // e.g. "Motivational", "Love", "Friendship"
+          feeling     // optional free-text mood from the user
+        } = body;
+
+        // ------------------------------------
+        // Validation
+        // ------------------------------------
+
+        if (!language || !category) {
+
+          return Response.json(
+            {
+              success: false,
+              error: "Language and category are required."
+            },
+            {
+              status: 400,
+              headers: corsHeaders
+            }
+          );
+
+        }
+
+        // ------------------------------------
+        // 🎯 PROMPT
+        // ------------------------------------
+
+        const feelingLine = feeling
+          ? `The user currently feels: "${feeling}". Let this subtly shape the quote's tone.`
+          : "";
+
+        const prompt = `
+You are a quote-writing assistant for a status/shayari app called StatusCraft AI.
+
+Write ONE original, short, emotionally resonant quote in ${language}.
+
+Category / theme: ${category}
+${feelingLine}
+
+RULES:
+- Output ONLY the quote text itself. No preamble, no explanation, no quotation marks, no author name.
+- Keep it short enough for a mobile status image (max 2 lines / ~25 words).
+- Do NOT attribute it to any real person — this must be an original line.
+- If the language is Hindi, write it in Devanagari script.
+- If the language is Hinglish, write Hindi words using English/Roman letters.
+- Make it feel warm, human, and fresh — avoid generic clichés.
+`;
+
+        // ------------------------------------
+        // 🤖 CLOUDFLARE WORKERS AI (Llama)
+        // ------------------------------------
+
+        const result = await env.AI.run(
+          "@cf/meta/llama-3.1-8b-instruct",
+          {
+            messages: [
+              { role: "user", content: prompt }
+            ],
+            max_tokens: 120
+          }
+        );
+
+        const quoteText =
+          result?.response?.trim() ||
+          null;
+
+        if (!quoteText) {
+
+          throw new Error(
+            "AI quote generate nahi ho payi."
+          );
+
+        }
+
+        // ------------------------------------
+        // RESPONSE
+        // ------------------------------------
+
+        return Response.json(
+          {
+            success: true,
+            quote: quoteText
+          },
+          {
+            status: 200,
+            headers: corsHeaders
+          }
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Quote generation error:",
+          error
+        );
+
+        return Response.json(
+          {
+            success: false,
+            error:
+              error?.message ||
+              String(error) ||
+              "Quote generation failed."
+          },
+          {
+            status: 500,
+            headers: corsHeaders
+          }
+        );
+
+      }
+
+    }
+
+    // ========================================
     // 🖼️ AI BACKGROUND MATCHING THE QUOTE
     // ========================================
 
