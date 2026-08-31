@@ -23,7 +23,7 @@ StatusCraft-AI/
 ├── quotes.json         # Curated quote database
 ├── manifest.json       # PWA manifest
 ├── sw.js               # Service worker (offline support)
-├── icon.svg             # App icon
+├── icon.svg             # App icon 
 └── README.md
 \```
 
