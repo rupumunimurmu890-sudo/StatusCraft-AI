@@ -569,18 +569,18 @@ async function generateStatus() {
 
     ctx.fillStyle = colors.text;
     ctx.textAlign = "center";
-    ctx.font = "bold 56px Georgia";
+    ctx.font = "900 64px Georgia";
 
     // Text ke peeche halka shadow — full-photo background par
     // bhi bold shayari saaf padhi jaye
-    ctx.shadowColor = "rgba(0,0,0,0.6)";
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetY = 2;
+    ctx.shadowColor = "rgba(0,0,0,0.7)";
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 3;
 
-    const maxTextWidth = 880;
+    const maxTextWidth = 900;
     const lines = wrapText(ctx, currentQuote, maxTextWidth);
 
-    const lineHeight = 68;
+    const lineHeight = 80;
     const totalTextHeight = lines.length * lineHeight;
     let startY = (1080 - totalTextHeight) / 2;
 
