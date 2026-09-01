@@ -23,10 +23,16 @@ const STYLE_VARIATIONS = [
 // dono isi function ko use karte hain
 // ------------------------------------
 
-async function generateUniqueQuote(env, language, category, feeling, recentQuotes) {
+async function generateUniqueQuote(env, language, category, feeling, recentQuotes, instruction) {
 
   const feelingLine = feeling
     ? `The user currently feels: "${feeling}". Let this subtly shape the quote's tone.`
+    : "";
+
+  // 🆕 Extra one-off instruction (used by "AI Edit" quick actions
+  // like Make More Emotional, Shorter, More Powerful)
+  const instructionLine = instruction
+    ? `Additional instruction for this generation: ${instruction}`
     : "";
 
   const randomStyle =
@@ -85,6 +91,7 @@ Write ONE original, short, emotionally resonant quote in ${language}.
 
 Category / theme: ${category}
 ${feelingLine}
+${instructionLine}
 Style for this one: ${randomStyle}
 (variation id: ${randomSeed} — use this only to ensure freshness, do not mention it)
 ${avoidBlock}
@@ -282,7 +289,8 @@ export default {
           language,
           category,
           feeling,
-          recentQuotes
+          recentQuotes,
+          instruction
         } = body;
 
         if (!language || !category) {
@@ -305,7 +313,8 @@ export default {
           language,
           category,
           feeling,
-          recentQuotes
+          recentQuotes,
+          instruction
         );
 
         if (!quoteText) {
@@ -426,13 +435,17 @@ QUOTE (do not render this text in the image, only capture its feeling):
 CATEGORY / MOOD: ${category || "general inspiration"}
 ${styleDirection ? "VISUAL STYLE: " + styleDirection : ""}
 
-IMPORTANT:
-- Do NOT include any text, letters or words in the image.
+IMPORTANT — absolutely no text or writing of any kind:
+- The image must contain ZERO letters, characters, numbers, symbols,
+  words, or writing in ANY language or script.
+- Do not render any text-like shapes, calligraphy, signage, book
+  pages, handwriting, or anything resembling readable characters.
 - Do NOT include any logos or watermarks.
-- Use a cinematic, emotionally resonant scene — nature, light,
-  silhouettes, or abstract atmosphere that matches the quote's feeling.
+- Use a purely visual, wordless scene — nature, light, silhouettes,
+  objects, or abstract atmosphere that matches the quote's feeling,
+  with no lettering anywhere in the frame.
 - Leave breathing room (uncluttered areas) so text can be overlaid
-  on top later.
+  on top later by the app itself.
 - Soft, warm, high-quality photographic lighting.
 - Vertical composition, suitable for a mobile status/story image.
 `;
