@@ -1,5 +1,86 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#1f6f54"/>
-  <text x="256" y="330" font-family="Georgia, serif" font-size="260" font-weight="600"
-        fill="#faf5ec" text-anchor="middle">"</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#33a67f"/>
+      <stop offset="45%" stop-color="#1f6f54"/>
+      <stop offset="100%" stop-color="#0f3d2c"/>
+    </linearGradient>
+
+    <radialGradient id="glowGrad" cx="35%" cy="28%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="55%" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff3c4"/>
+      <stop offset="45%" stop-color="#ffd873"/>
+      <stop offset="100%" stop-color="#e8a531"/>
+    </linearGradient>
+
+    <linearGradient id="goldGradSoft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff3c4" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#e8a531" stop-opacity="0.85"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0a2a1e" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect x="8" y="8" width="496" height="496" rx="128" fill="url(#bgGrad)"/>
+
+  <rect x="8" y="8" width="496" height="496" rx="128" fill="url(#glowGrad)"/>
+
+  <rect x="26" y="26" width="460" height="460" rx="112" fill="none"
+        stroke="#ffffff" stroke-opacity="0.14" stroke-width="2"/>
+
+  <g filter="url(#softShadow)">
+
+    <path d="M 256 118
+             C 314 118, 360 164, 360 222
+             C 360 264, 336 300, 300 316
+             C 296 318, 291 315, 292 310
+             C 300 282, 296 256, 276 240
+             C 296 234, 310 214, 310 190
+             C 310 156, 282 132, 248 132
+             C 244 132, 242 128, 244 124
+             C 247 121, 251 119, 256 118 Z"
+          fill="url(#goldGrad)"/>
+
+    <path d="M 256 394
+             C 198 394, 152 348, 152 290
+             C 152 248, 176 212, 212 196
+             C 216 194, 221 197, 220 202
+             C 212 230, 216 256, 236 272
+             C 216 278, 202 298, 202 322
+             C 202 356, 230 380, 264 380
+             C 268 380, 270 384, 268 388
+             C 265 391, 261 393, 256 394 Z"
+          fill="url(#goldGradSoft)"/>
+
+  </g>
+
+  <path d="M 388 96
+           L 396 116
+           L 416 124
+           L 396 132
+           L 388 152
+           L 380 132
+           L 360 124
+           L 380 116
+           Z"
+        fill="#ffffff" opacity="0.9"/>
+
+  <path d="M 118 372
+           L 124 386
+           L 138 392
+           L 124 398
+           L 118 412
+           L 112 398
+           L 98 392
+           L 112 386
+           Z"
+        fill="#ffffff" opacity="0.55"/>
+
 </svg>
