@@ -33,7 +33,8 @@ export default {
         const {
           language,   // e.g. "Hindi", "English", "Hinglish"
           category,   // e.g. "Motivational", "Love", "Friendship"
-          feeling     // optional free-text mood from the user
+          feeling,    // optional free-text mood from the user
+          recentQuotes // 🆕 array of quotes already shown to this user
         } = body;
 
         // ------------------------------------
@@ -92,7 +93,57 @@ export default {
         const randomSeed =
           Math.random().toString(36).slice(2, 10);
 
-        const prompt = `
+        // ------------------------------------
+        // 🆕 GLOBAL duplicate check — KV se
+        // (sirf is user ka history nahi, PURE APP
+        // ke saare users ke quotes is language+category
+        // ke liye yaha store hote hain)
+        // ------------------------------------
+
+        const kvKey = `quotes:${language}:${category}`;
+        const KV_LIST_LIMIT = 500;
+
+        let globalQuoteList = [];
+
+        if (env.QUOTES_KV) {
+
+          try {
+
+            const stored = await env.QUOTES_KV.get(kvKey);
+            globalQuoteList = stored ? JSON.parse(stored) : [];
+
+          } catch (kvReadError) {
+
+            console.error("KV read error:", kvReadError);
+            globalQuoteList = [];
+          }
+        }
+
+        // AI ko dikhane ke liye — global list se latest kuch
+        // + client ne jo bheja (recentQuotes) dono milakar
+        const clientRecent =
+          Array.isArray(recentQuotes) ? recentQuotes : [];
+
+        const avoidList = Array.from(
+          new Set([
+            ...globalQuoteList.slice(-30),
+            ...clientRecent.slice(-20)
+          ])
+        );
+
+        const avoidBlock =
+          avoidList.length > 0
+            ? `
+
+The following quotes have already been shown to users. Do NOT repeat
+any of them, and do NOT write anything that closely resembles their
+wording or structure — generate something genuinely different:
+${avoidList.map(function (q) { return "- " + q; }).join("\n")}`
+            : "";
+
+        function buildPrompt() {
+
+          return `
 You are a quote-writing assistant for a status/shayari app called StatusCraft AI.
 
 Write ONE original, short, emotionally resonant quote in ${language}.
@@ -101,6 +152,7 @@ Category / theme: ${category}
 ${feelingLine}
 Style for this one: ${randomStyle}
 (variation id: ${randomSeed} — use this only to ensure freshness, do not mention it)
+${avoidBlock}
 
 RULES:
 - Output ONLY the quote text itself. No preamble, no explanation, no quotation marks, no author name.
@@ -113,25 +165,71 @@ RULES:
 - If you are not fully confident in a requested language's script, still write a warm, correct quote in that language using its most commonly used script, rather than falling back to Hindi or English.
 - Make it feel warm, human, and fresh — avoid generic clichés.
 `;
+        }
 
         // ------------------------------------
         // 🤖 CLOUDFLARE WORKERS AI (Llama)
+        // 🆕 Retry up to 3 baar agar output kisi
+        // bhi purane global quote se exact match kare
         // ------------------------------------
 
-        const result = await env.AI.run(
-          "@cf/meta/llama-3.1-8b-instruct",
-          {
-            messages: [
-              { role: "user", content: prompt }
-            ],
-            max_tokens: 120,
-            temperature: 1.3
-          }
-        );
+        let quoteText = null;
 
-        const quoteText =
-          result?.response?.trim() ||
-          null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+
+          const result = await env.AI.run(
+            "@cf/meta/llama-3.1-8b-instruct",
+            {
+              messages: [
+                { role: "user", content: buildPrompt() }
+              ],
+              max_tokens: 120,
+              temperature: 1.3
+            }
+          );
+
+          const candidate = result?.response?.trim() || null;
+
+          const isDuplicate =
+            candidate &&
+            globalQuoteList.some(function (q) {
+              return q.trim() === candidate.trim();
+            });
+
+          if (candidate && !isDuplicate) {
+            quoteText = candidate;
+            break;
+          }
+
+          quoteText = candidate; // last attempt ka result rakh lo, fallback ke liye
+        }
+
+        // ------------------------------------
+        // 🆕 Naya quote global list mein save karo
+        // (KV mein) — taaki agla koi bhi user isse
+        // dobara na paye
+        // ------------------------------------
+
+        if (env.QUOTES_KV && quoteText) {
+
+          try {
+
+            globalQuoteList.push(quoteText);
+
+            while (globalQuoteList.length > KV_LIST_LIMIT) {
+              globalQuoteList.shift();
+            }
+
+            await env.QUOTES_KV.put(
+              kvKey,
+              JSON.stringify(globalQuoteList)
+            );
+
+          } catch (kvWriteError) {
+
+            console.error("KV write error:", kvWriteError);
+          }
+        }
 
         if (!quoteText) {
 
