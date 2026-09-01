@@ -113,5 +113,166 @@
       "Focus rakho, result khud ba khud aayega.",
       "Jo aaj mehnat karega, wahi kal history banayega."
     ]
+  },
+  "Happy": {
+    "English": [
+      "Happiness looks gorgeous on you — wear it often.",
+      "Choose joy today, it looks good on you.",
+      "A happy heart makes even ordinary days feel golden.",
+      "Life is better when you're laughing.",
+      "Some days just feel like sunshine from the inside out."
+    ],
+    "Hindi": [
+      "खुशियाँ छोटी-छोटी बातों में छुपी होती हैं, बस देखना आना चाहिए।",
+      "मुस्कुराते रहो, यही सबसे अच्छा फैशन है।",
+      "जिंदगी को हल्के दिल से जियो, खुशी खुद चली आएगी।",
+      "आज का दिन खुशियों से भरा हो।",
+      "खुश रहना एक कला है, इसे रोज़ प्रैक्टिस करो।"
+    ],
+    "Hinglish": [
+      "Khushi koi destination nahi, ek choice hai — roz karo.",
+      "Chhoti chhoti baatein bhi khushi de sakti hain, bas dekhna aana chahiye.",
+      "Aaj bas smile karo, wajah baad mein dhoond lena.",
+      "Life short hai, isliye khush rehna zaroori hai.",
+      "Jo khush rehna jaanta hai, wahi asli ameer hai."
+    ]
+  },
+  "Sad": {
+    "English": [
+      "It's okay to not be okay sometimes — healing isn't linear.",
+      "Even the darkest night will end and the sun will rise.",
+      "Some tears water the growth you can't see yet.",
+      "It's okay to feel heavy today, tomorrow can be lighter.",
+      "Behind every smile there's a story you don't know."
+    ],
+    "Hindi": [
+      "कभी-कभी उदास होना भी ज़रूरी है, खुद को समझने के लिए।",
+      "आंसू भी कुछ कहते हैं, बस सुनने वाला चाहिए।",
+      "हर रात के बाद एक सुबह जरूर आती है।",
+      "दिल भारी है, पर उम्मीद अभी बाकी है।",
+      "मुस्कुराहट के पीछे भी एक कहानी छुपी होती है।"
+    ],
+    "Hinglish": [
+      "Kabhi kabhi udaas hona bhi theek hai, khud ko samajhne ke liye.",
+      "Dard bhi zindagi ka hissa hai, isse bhi guzarna padta hai.",
+      "Aaj mann bhaari hai, lekin kal phir se roshni aayegi.",
+      "Rona bhi kamzori nahi, kabhi kabhi zaroorat hoti hai.",
+      "Har mushkil waqt guzar jaata hai, bas thoda sabar chahiye."
+    ]
+  },
+  "Attitude": {
+    "English": [
+      "I don't chase, I attract. What is meant to be will simply be.",
+      "My silence is just another word for my attitude.",
+      "I am not perfect, but I am limited edition.",
+      "Confidence level: selfie without filter.",
+      "I don't need your approval to be who I am."
+    ],
+    "Hindi": [
+      "मेरी खामोशी को मेरी कमजोरी मत समझना।",
+      "मैं वो नहीं हूँ जो झुकना जानता है।",
+      "अपने अंदाज़ में जीना ही असली स्टाइल है।",
+      "मुझे परखने से पहले खुद को परख लेना।",
+      "मेरा attitude मेरी पहचान है, किसी की राय नहीं।"
+    ],
+    "Hinglish": [
+      "Apna style khud banate hain, copy nahi karte.",
+      "Log kya kahenge, ye sochna chhod diya hai maine.",
+      "Meri chaal hi meri pehchaan hai.",
+      "Confidence hi meri sabse badi jewellery hai.",
+      "Main apne rules khud likhta hoon."
+    ]
+  },
+  "Devotional": {
+    "English": [
+      "Faith is the quiet strength that carries us through every storm.",
+      "When you can't see the way, trust the One who can.",
+      "Gratitude turns what we have into enough.",
+      "Prayer is the bridge between our worries and His peace.",
+      "In every sunrise, there's a reminder that He never fails."
+    ],
+    "Hindi": [
+      "जहाँ भरोसा हो भगवान पर, वहाँ हर मुश्किल आसान हो जाती है।",
+      "प्रार्थना में वो ताकत है, जो हर दर्द को हल्का कर देती है।",
+      "उसकी मर्ज़ी के बिना एक पत्ता भी नहीं हिलता।",
+      "श्रद्धा रखो, रास्ता खुद बन जाएगा।",
+      "भगवान की कृपा से हर अंधेरा उजाले में बदल जाता है।"
+    ],
+    "Hinglish": [
+      "Bhagwan pe bharosa rakho, sab theek ho jaayega.",
+      "Prarthana mein wo shakti hai jo har dukh kam kar deti hai.",
+      "Uski marzi se hi sab kuch hota hai, bas vishwas rakho.",
+      "Shraddha se bada koi sahara nahi hota.",
+      "Jahan bhakti hai, wahan shanti khud aa jaati hai."
+    ]
+  },
+  "Emotional": {
+    "English": [
+      "Some feelings don't need words, just someone who understands.",
+      "I miss the version of us that used to talk every day.",
+      "It's hard to explain a feeling that lives quietly in your chest.",
+      "Some goodbyes are never really said out loud.",
+      "The heart remembers what the mind tries to forget."
+    ],
+    "Hindi": [
+      "कुछ एहसास लफ़्ज़ों में बयां नहीं होते।",
+      "तेरी याद आज फिर दिल को उदास कर गई।",
+      "कुछ रिश्ते खत्म नहीं होते, बस दूर हो जाते हैं।",
+      "दिल की बातें अक्सर आंखों से बयां हो जाती हैं।",
+      "बिछड़ना भी कभी-कभी प्यार का हिस्सा होता है।"
+    ],
+    "Hinglish": [
+      "Kuch feelings words mein express nahi ho paate.",
+      "Aaj phir teri yaad aayi, pata nahi kyun.",
+      "Kuch log door hoke bhi dil ke paas rehte hain.",
+      "Dil ki baatein aankhon se hi keh di jaati hain kabhi kabhi.",
+      "Bichadna bhi shayad pyaar ka hi ek hissa hai."
+    ]
+  },
+  "Nature": {
+    "English": [
+      "The mountains are calling, and I must go.",
+      "Nature does not hurry, yet everything is accomplished.",
+      "There's a peace only the trees and the sky can give.",
+      "The earth has music for those who listen.",
+      "Every leaf, every breeze carries a quiet kind of wisdom."
+    ],
+    "Hindi": [
+      "प्रकृति की गोद में सुकून खुद-ब-खुद मिल जाता है।",
+      "हवा की सरसराहट में भी एक संगीत छुपा होता है।",
+      "पहाड़, नदियाँ और हरियाली — यही असली सुकून है।",
+      "जो प्रकृति के करीब रहता है, वो खुद को कभी नहीं खोता।",
+      "हर सुबह पंछियों की चहचहाहट एक नई उम्मीद लाती है।"
+    ],
+    "Hinglish": [
+      "Pahado ki khamoshi mein bhi ek awaaz hoti hai.",
+      "Nature ke paas jaate hi mann shant ho jaata hai.",
+      "Hari bhari waadiyan dil ko sukoon deti hain.",
+      "Prakriti se bada koi teacher nahi hota.",
+      "Fresh hawa aur khula aasman — yehi asli khushi hai."
+    ]
+  },
+  "Celebration": {
+    "English": [
+      "Here's to the moments worth celebrating and the memories yet to come.",
+      "Life is a celebration — dance through it.",
+      "Every milestone deserves a little confetti.",
+      "Good times, great people, unforgettable memories.",
+      "Celebrate the small wins, they add up to big victories."
+    ],
+    "Hindi": [
+      "जिंदगी का हर पल जश्न मनाने लायक है।",
+      "खुशियों के इस पल को दिल खोलकर मनाओ।",
+      "छोटी-छोटी जीत भी सेलिब्रेशन की हकदार होती है।",
+      "आज का दिन यादगार बन जाए, यही दुआ है।",
+      "साथ मिलकर मनाई खुशी दोगुनी हो जाती है।"
+    ],
+    "Hinglish": [
+      "Zindagi ka har moment celebration ke laayak hai.",
+      "Aaj ka din yaadgar banao, dil khol ke enjoy karo.",
+      "Chhoti jeet bhi party deserve karti hai.",
+      "Good vibes, good people — bas yehi chahiye celebration ke liye.",
+      "Khushiyan share karo, wo aur badh jaati hain."
+    ]
   }
 }
