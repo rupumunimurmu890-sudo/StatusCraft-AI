@@ -53,6 +53,43 @@
   }
   html.dark-mode .statsCounter { color: #999; }
 
+  /* 🆕 Mood emoji chips */
+  .moodChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .moodChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 13px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    background: #fff;
+    color: #333;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+  .moodChip:hover { transform: translateY(-1px); }
+  .moodChip.active {
+    background: #1f6f54;
+    border-color: #1f6f54;
+    color: #fff;
+  }
+  html.dark-mode .moodChip {
+    background: #232323;
+    color: #e9e9e9;
+    border-color: #3a3a3a;
+  }
+  html.dark-mode .moodChip.active {
+    background: #2a8f6d;
+    border-color: #2a8f6d;
+  }
+
   /* 🆕 Dark mode toggle button */
   .themeToggleBtn {
     display: inline-flex;
@@ -208,6 +245,24 @@
     <!-- ================= LEFT: CONTROLS ================= -->
     <section class="panel controlsPanel">
 
+      <div class="field">
+        <label>
+          <svg class="fieldIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+          Choose your mood
+        </label>
+        <div id="moodChips" class="moodChips">
+          <button type="button" class="moodChip" data-category="Happy" data-emoji="😊">😊 Happy</button>
+          <button type="button" class="moodChip" data-category="Sad" data-emoji="😢">😢 Sad</button>
+          <button type="button" class="moodChip" data-category="Love" data-emoji="❤️">❤️ Love</button>
+          <button type="button" class="moodChip" data-category="Attitude" data-emoji="😎">😎 Attitude</button>
+          <button type="button" class="moodChip" data-category="Motivational" data-emoji="🔥">🔥 Motivation</button>
+          <button type="button" class="moodChip" data-category="Devotional" data-emoji="🙏">🙏 Devotional</button>
+          <button type="button" class="moodChip" data-category="Emotional" data-emoji="💔">💔 Emotional</button>
+          <button type="button" class="moodChip" data-category="Nature" data-emoji="🌿">🌿 Nature</button>
+          <button type="button" class="moodChip" data-category="Celebration" data-emoji="🎉">🎉 Celebration</button>
+        </div>
+      </div>
+
       <div class="fieldRow">
 
         <div class="field">
@@ -254,6 +309,13 @@
             <option value="Friendship">Friendship</option>
             <option value="Good Morning">Good Morning</option>
             <option value="Success">Success</option>
+            <option value="Happy">Happy</option>
+            <option value="Sad">Sad</option>
+            <option value="Attitude">Attitude</option>
+            <option value="Devotional">Devotional</option>
+            <option value="Emotional">Emotional</option>
+            <option value="Nature">Nature</option>
+            <option value="Celebration">Celebration</option>
           </select>
         </div>
 
