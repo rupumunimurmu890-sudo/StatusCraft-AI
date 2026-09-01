@@ -40,7 +40,7 @@ function getRandomQuote() {
     QUOTES_DATA?.[category]?.[language] || [];
 
   if (list.length === 0) {
-    return "Quote उपलब्ध नहीं है इस भाषा/category में।";
+    return null;
   }
 
   const randomIndex =
@@ -112,31 +112,56 @@ async function fetchAIQuote() {
   // Recent history bhej rahe hain taaki AI repeat na kare
   const recentQuotes = getQuoteHistory().slice(-20);
 
-  const response = await fetch("/api/generate-quote", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      language,
-      category,
-      feeling,
-      recentQuotes
-    })
+  const requestBody = JSON.stringify({
+    language,
+    category,
+    feeling,
+    recentQuotes
   });
 
-  const data = await response.json();
+  // 🆕 Automatic retry — network/AI hiccup ho toh
+  // user ko error dikhane se pehle 2 baar aur try karo
+  let lastError = null;
 
-  if (!response.ok || !data.success || !data.quote) {
-    throw new Error(data?.error || "AI quote नहीं मिली।");
+  for (let attempt = 0; attempt < 3; attempt++) {
+
+    try {
+
+      const response = await fetch("/api/generate-quote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: requestBody
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success || !data.quote) {
+        throw new Error(data?.error || "AI quote नहीं मिली।");
+      }
+
+      addToQuoteHistory(data.quote);
+
+      // 🆕 Har naye quote ke baad counter refresh karo
+      refreshStatsCounter();
+
+      return data.quote;
+
+    } catch (error) {
+
+      lastError = error;
+
+      // Turant retry na karo — thoda ruk ke try karo
+      if (attempt < 2) {
+        await new Promise(function (resolve) {
+          setTimeout(resolve, 600);
+        });
+      }
+    }
   }
 
-  addToQuoteHistory(data.quote);
-
-  // 🆕 Har naye quote ke baad counter refresh karo
-  refreshStatsCounter();
-
-  return data.quote;
+  throw lastError;
 }
 
 
@@ -154,7 +179,22 @@ async function getNewQuote() {
 
     console.error("AI quote error, falling back:", error);
 
-    return getRandomQuote();
+    const staticQuote = getRandomQuote();
+
+    if (staticQuote) {
+      return staticQuote;
+    }
+
+    // 🆕 Na AI mila na static fallback — user ko clear
+    // bataye ki kya hua, ugly placeholder text mat dikhao
+    if (window.showToast) {
+      window.showToast(
+        "Quote नहीं बन पाया — network check करके फिर try करें।",
+        "error"
+      );
+    }
+
+    return "🌐 Network धीमा लग रहा है — कृपया फिर से 'Generate Quote' दबाएं।";
   }
 }
 
@@ -223,7 +263,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   // Pehli quote — static (turant dikhe, AI ka wait na karna pade)
-  currentQuote = getRandomQuote();
+  currentQuote = getRandomQuote() || "✨ 'Generate Quote' दबाकर अपना पहला status quote बनाएं।";
 
   if (quoteText) {
     quoteText.textContent = currentQuote;
