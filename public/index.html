@@ -135,6 +135,18 @@
           </select>
         </div>
 
+        <div class="field">
+          <label for="format">
+            <svg class="fieldIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+            Format
+          </label>
+          <select id="format">
+            <option value="square">Square — Instagram Post (1:1)</option>
+            <option value="status">Status/Story — WhatsApp, Insta Story (9:16)</option>
+            <option value="post">Portrait — Instagram Feed (4:5)</option>
+          </select>
+        </div>
+
       </div>
 
       <button type="button" id="getQuoteBtn" class="secondaryBtn">
@@ -303,6 +315,9 @@
       deferredInstallPrompt = null;
     });
   </script>
+  <!-- Cloudflare Web Analytics -->
+  <script defer type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f3c24750483446b4b139f232621bdd43"}'></script>
+  <!-- End Cloudflare Web Analytics -->
 
 </body>
 </html>
