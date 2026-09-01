@@ -1,6 +1,6 @@
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type"
 };
 
@@ -15,6 +15,38 @@ export default {
         status: 204,
         headers: corsHeaders
       });
+    }
+
+    // ========================================
+    // 📊 STATS — total quotes generated so far
+    // ========================================
+
+    if (
+      url.pathname === "/api/stats" &&
+      request.method === "GET"
+    ) {
+
+      try {
+
+        let count = 0;
+
+        if (env.QUOTES_KV) {
+          const stored = await env.QUOTES_KV.get("stats:totalQuotes");
+          count = stored ? parseInt(stored, 10) || 0 : 0;
+        }
+
+        return Response.json(
+          { success: true, count },
+          { status: 200, headers: corsHeaders }
+        );
+
+      } catch (error) {
+
+        return Response.json(
+          { success: false, count: 0 },
+          { status: 200, headers: corsHeaders }
+        );
+      }
     }
 
     // ========================================
@@ -224,6 +256,11 @@ RULES:
               kvKey,
               JSON.stringify(globalQuoteList)
             );
+
+            // 🆕 Total counter badhao
+            const currentCount = await env.QUOTES_KV.get("stats:totalQuotes");
+            const newCount = (currentCount ? parseInt(currentCount, 10) || 0 : 0) + 1;
+            await env.QUOTES_KV.put("stats:totalQuotes", String(newCount));
 
           } catch (kvWriteError) {
 
