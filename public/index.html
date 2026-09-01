@@ -90,6 +90,43 @@
     border-color: #2a8f6d;
   }
 
+  /* 🆕 Daily Inspiration section */
+  .dailyInspiration {
+    max-width: 900px;
+    margin: 16px auto 0;
+    padding: 16px 20px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fff7e6, #fff);
+    border: 1px solid rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  .dailyInspirationLabel {
+    font-size: 13px;
+    font-weight: 700;
+    color: #b8860b;
+    margin-bottom: 6px;
+  }
+  .dailyQuoteText {
+    font-size: 15px;
+    margin: 0 0 10px;
+    color: #333;
+  }
+  .dailyUseBtn {
+    border: none;
+    background: #1f6f54;
+    color: #fff;
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  html.dark-mode .dailyInspiration {
+    background: linear-gradient(135deg, #262013, #1a1a1a);
+    border-color: #333;
+  }
+  html.dark-mode .dailyQuoteText { color: #eee; }
+
   /* 🆕 Dark mode toggle button */
   .themeToggleBtn {
     display: inline-flex;
@@ -240,6 +277,12 @@
     </div>
   </header>
 
+  <div id="dailyInspiration" class="dailyInspiration" style="display:none;">
+    <div class="dailyInspirationLabel">✨ Today's Inspiration</div>
+    <p id="dailyQuoteText" class="dailyQuoteText"></p>
+    <button type="button" id="useDailyQuoteBtn" class="dailyUseBtn">Use This →</button>
+  </div>
+
   <main class="layout">
 
     <!-- ================= LEFT: CONTROLS ================= -->
@@ -254,12 +297,16 @@
           <button type="button" class="moodChip" data-category="Happy" data-emoji="😊">😊 Happy</button>
           <button type="button" class="moodChip" data-category="Sad" data-emoji="😢">😢 Sad</button>
           <button type="button" class="moodChip" data-category="Love" data-emoji="❤️">❤️ Love</button>
+          <button type="button" class="moodChip" data-category="Emotional" data-emoji="💔">💔 Heartbreak</button>
           <button type="button" class="moodChip" data-category="Attitude" data-emoji="😎">😎 Attitude</button>
           <button type="button" class="moodChip" data-category="Motivational" data-emoji="🔥">🔥 Motivation</button>
-          <button type="button" class="moodChip" data-category="Devotional" data-emoji="🙏">🙏 Devotional</button>
-          <button type="button" class="moodChip" data-category="Emotional" data-emoji="💔">💔 Emotional</button>
-          <button type="button" class="moodChip" data-category="Nature" data-emoji="🌿">🌿 Nature</button>
+          <button type="button" class="moodChip" data-category="Missing Someone" data-emoji="🥺">🥺 Missing Someone</button>
+          <button type="button" class="moodChip" data-category="Lonely" data-emoji="🌧️">🌧️ Lonely</button>
+          <button type="button" class="moodChip" data-category="Devotional" data-emoji="🙏">🙏 Faith</button>
+          <button type="button" class="moodChip" data-category="Nature" data-emoji="🌿">🌿 Peace</button>
           <button type="button" class="moodChip" data-category="Celebration" data-emoji="🎉">🎉 Celebration</button>
+          <button type="button" class="moodChip" data-category="Funny" data-emoji="😂">😂 Funny</button>
+          <button type="button" class="moodChip" data-category="Royal" data-emoji="👑">👑 Royal</button>
         </div>
       </div>
 
@@ -316,6 +363,10 @@
             <option value="Emotional">Emotional</option>
             <option value="Nature">Nature</option>
             <option value="Celebration">Celebration</option>
+            <option value="Missing Someone">Missing Someone</option>
+            <option value="Lonely">Lonely</option>
+            <option value="Funny">Funny</option>
+            <option value="Royal">Royal</option>
           </select>
         </div>
 
@@ -341,6 +392,24 @@
             <option value="square">Square — Instagram Post (1:1)</option>
             <option value="status">Status/Story — WhatsApp, Insta Story (9:16)</option>
             <option value="post">Portrait — Instagram Feed (4:5)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="aiStyle">
+            <svg class="fieldIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3z"/></svg>
+            AI Style
+          </label>
+          <select id="aiStyle">
+            <option value="">Auto (AI decides)</option>
+            <option value="cinematic">🎬 Cinematic</option>
+            <option value="photorealistic">📸 Photorealistic</option>
+            <option value="artistic">🎨 Artistic</option>
+            <option value="dark">🌑 Dark</option>
+            <option value="luxury">✨ Luxury</option>
+            <option value="nature">🌿 Nature</option>
+            <option value="minimal">🖤 Minimal</option>
+            <option value="dreamy">🌅 Dreamy</option>
           </select>
         </div>
 
@@ -413,6 +482,11 @@
       </div>
 
       <div id="resultActions" class="resultActions">
+
+        <button type="button" id="remixBtn" class="actionBtn actionRemix">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6M20 20v-6h-6M4.5 15A8 8 0 0019 9M19.5 9A8 8 0 015 15"/></svg>
+          Remix
+        </button>
 
         <button type="button" id="downloadStatusBtn" class="actionBtn actionDownload">
           <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
