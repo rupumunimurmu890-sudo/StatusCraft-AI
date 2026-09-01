@@ -127,6 +127,22 @@
   }
   html.dark-mode .dailyQuoteText { color: #eee; }
 
+  /* 🆕 CLS fix — previewFrame ke liye fixed jagah reserve
+     karo taaki image load hone pe box jump na kare */
+  .previewFrame {
+    min-height: 420px;
+  }
+  @media (min-width: 640px) {
+    .previewFrame { min-height: 520px; }
+  }
+
+  /* 🆕 CLS fix — Daily Inspiration box hamesha apni jagah
+     occupy kare (display:none/block toggle nahi, taaki
+     neeche ka content — footer samet — shift na ho) */
+  .dailyInspiration {
+    min-height: 84px;
+  }
+
   /* 🆕 Dark mode toggle button */
   .themeToggleBtn {
     display: inline-flex;
@@ -277,10 +293,10 @@
     </div>
   </header>
 
-  <div id="dailyInspiration" class="dailyInspiration" style="display:none;">
+  <div id="dailyInspiration" class="dailyInspiration skeletonPulse">
     <div class="dailyInspirationLabel">✨ Today's Inspiration</div>
-    <p id="dailyQuoteText" class="dailyQuoteText"></p>
-    <button type="button" id="useDailyQuoteBtn" class="dailyUseBtn">Use This →</button>
+    <p id="dailyQuoteText" class="dailyQuoteText">Loading today's quote…</p>
+    <button type="button" id="useDailyQuoteBtn" class="dailyUseBtn" style="visibility:hidden;">Use This →</button>
   </div>
 
   <main class="layout">
