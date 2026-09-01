@@ -320,6 +320,100 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
   // ------------------------------------
+  // 🆕 Remix — same quote, naya design
+  // (random template style + AI style badal ke
+  // dobara generate karo, quote wahi rahega)
+  // ------------------------------------
+
+  const remixBtn = document.getElementById("remixBtn");
+
+  if (remixBtn) {
+
+    remixBtn.addEventListener("click", function () {
+
+      const templateSelect = document.getElementById("templateStyle");
+      const aiStyleSelect = document.getElementById("aiStyle");
+
+      if (templateSelect && templateSelect.options.length > 1) {
+
+        let newIndex;
+
+        do {
+          newIndex = Math.floor(Math.random() * templateSelect.options.length);
+        } while (
+          templateSelect.options.length > 1 &&
+          templateSelect.selectedIndex === newIndex
+        );
+
+        templateSelect.selectedIndex = newIndex;
+      }
+
+      if (aiStyleSelect && aiStyleSelect.options.length > 1) {
+
+        let newIndex;
+
+        do {
+          newIndex = Math.floor(Math.random() * aiStyleSelect.options.length);
+        } while (
+          aiStyleSelect.options.length > 1 &&
+          aiStyleSelect.selectedIndex === newIndex
+        );
+
+        aiStyleSelect.selectedIndex = newIndex;
+      }
+
+      generateStatus();
+    });
+  }
+
+
+  // ------------------------------------
+  // 🆕 Daily Inspiration — homepage pe
+  // aaj ka quote dikhao
+  // ------------------------------------
+
+  (async function loadDailyInspiration() {
+
+    try {
+
+      const response = await fetch("/api/daily-quote");
+      const data = await response.json();
+
+      const dailyBox = document.getElementById("dailyInspiration");
+      const dailyText = document.getElementById("dailyQuoteText");
+      const useDailyBtn = document.getElementById("useDailyQuoteBtn");
+
+      if (data && data.success && data.quote && dailyBox && dailyText) {
+
+        dailyText.textContent = data.quote;
+        dailyBox.style.display = "block";
+
+        if (useDailyBtn) {
+
+          useDailyBtn.addEventListener("click", function () {
+
+            currentQuote = data.quote;
+
+            if (quoteText) {
+              quoteText.textContent = currentQuote;
+            }
+
+            const controlsPanel = document.querySelector(".controlsPanel");
+            if (controlsPanel) {
+              controlsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          });
+        }
+      }
+
+    } catch (error) {
+
+      console.error("Daily inspiration load error:", error);
+    }
+  })();
+
+
+  // ------------------------------------
   // 🆕 Mood emoji chips — tap karte hi category
   // set ho aur turant naya quote generate ho
   // ------------------------------------
@@ -728,6 +822,9 @@ async function generateStatus() {
         const category =
           document.getElementById("category")?.value || "";
 
+        const aiStyle =
+          document.getElementById("aiStyle")?.value || "";
+
         const bgResponse = await fetch(
           "/api/generate-quote-background",
           {
@@ -737,7 +834,8 @@ async function generateStatus() {
             },
             body: JSON.stringify({
               quote: currentQuote,
-              category
+              category,
+              style: aiStyle
             })
           }
         );
