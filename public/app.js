@@ -484,14 +484,31 @@ async function generateStatus() {
 
 
     // ------------------------------------
-    // Canvas setup
+    // 🆕 Canvas setup — selected format ke
+    // hisaab se size decide karo
     // ------------------------------------
+
+    const FORMAT_SIZES = {
+      square: { width: 1080, height: 1080 },
+      status: { width: 1080, height: 1920 },
+      post: { width: 1080, height: 1350 }
+    };
+
+    const formatKey =
+      document.getElementById("format")?.value || "square";
+
+    const format =
+      FORMAT_SIZES[formatKey] || FORMAT_SIZES.square;
 
     const canvas =
       document.createElement("canvas");
 
-    canvas.width = 1080;
-    canvas.height = 1080;
+    canvas.width = format.width;
+    canvas.height = format.height;
+
+    const canvasW = canvas.width;
+    const canvasH = canvas.height;
+    const centerX = canvasW / 2;
 
     const ctx =
       canvas.getContext("2d");
@@ -511,20 +528,20 @@ async function generateStatus() {
     function drawImageCover(image) {
 
       const imgRatio = image.width / image.height;
-      const canvasRatio = 1080 / 1080;
+      const canvasRatio = canvasW / canvasH;
 
       let drawWidth, drawHeight, drawX, drawY;
 
       if (imgRatio > canvasRatio) {
-        drawHeight = 1080;
-        drawWidth = 1080 * imgRatio;
-        drawX = (1080 - drawWidth) / 2;
+        drawHeight = canvasH;
+        drawWidth = canvasH * imgRatio;
+        drawX = (canvasW - drawWidth) / 2;
         drawY = 0;
       } else {
-        drawWidth = 1080;
-        drawHeight = 1080 / imgRatio;
+        drawWidth = canvasW;
+        drawHeight = canvasW / imgRatio;
         drawX = 0;
-        drawY = (1080 - drawHeight) / 2;
+        drawY = (canvasH - drawHeight) / 2;
       }
 
       ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
@@ -565,14 +582,14 @@ async function generateStatus() {
         // Text readable rakhne ke liye dark gradient overlay
         // (upar halka, neeche zyada dark — jaha text hoga)
         const overlay =
-          ctx.createLinearGradient(0, 0, 0, 1080);
+          ctx.createLinearGradient(0, 0, 0, canvasH);
 
         overlay.addColorStop(0, "rgba(0,0,0,0.45)");
         overlay.addColorStop(0.5, "rgba(0,0,0,0.35)");
         overlay.addColorStop(1, "rgba(0,0,0,0.55)");
 
         ctx.fillStyle = overlay;
-        ctx.fillRect(0, 0, 1080, 1080);
+        ctx.fillRect(0, 0, canvasW, canvasH);
 
         backgroundDrawn = true;
 
@@ -634,7 +651,7 @@ async function generateStatus() {
 
           // Text readable rakhne ke liye halka dark overlay
           ctx.fillStyle = "rgba(0,0,0,0.35)";
-          ctx.fillRect(0, 0, 1080, 1080);
+          ctx.fillRect(0, 0, canvasW, canvasH);
 
           backgroundDrawn = true;
         }
@@ -655,13 +672,13 @@ async function generateStatus() {
       // ---- 3) Gradient fallback ----
 
       const gradient =
-        ctx.createLinearGradient(0, 0, 1080, 1080);
+        ctx.createLinearGradient(0, 0, canvasW, canvasH);
 
       gradient.addColorStop(0, colors.from);
       gradient.addColorStop(1, colors.to);
 
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 1080, 1080);
+      ctx.fillRect(0, 0, canvasW, canvasH);
     }
 
 
@@ -690,12 +707,12 @@ async function generateStatus() {
     ctx.shadowBlur = 16;
     ctx.shadowOffsetY = 3;
 
-    const maxTextWidth = 940;
+    const maxTextWidth = Math.min(940, canvasW - 140);
     const lines = wrapText(ctx, currentQuote, maxTextWidth);
 
     const lineHeight = 94;
     const totalTextHeight = lines.length * lineHeight;
-    let startY = (1080 - totalTextHeight) / 2;
+    let startY = (canvasH - totalTextHeight) / 2;
 
     // Photo/name jagah ke liye thoda upar shift karo
     if (photoFile || userName) {
@@ -706,7 +723,7 @@ async function generateStatus() {
       drawStyledLine(
         ctx,
         line,
-        540,
+        centerX,
         startY + (i * lineHeight),
         colors.text,
         colors.highlights
@@ -733,7 +750,7 @@ async function generateStatus() {
       ctx.fillStyle = colors.accent;
       ctx.shadowColor = "rgba(0,0,0,0.6)";
       ctx.shadowBlur = 8;
-      ctx.fillText("— " + userName, 540, contentBottomY);
+      ctx.fillText("— " + userName, centerX, contentBottomY);
       ctx.shadowColor = "transparent";
       ctx.shadowBlur = 0;
     }
@@ -746,7 +763,7 @@ async function generateStatus() {
     ctx.font = "24px Arial";
     ctx.fillStyle = colors.text;
     ctx.globalAlpha = 0.75;
-    ctx.fillText("✨ StatusCraft AI", 540, 1010);
+    ctx.fillText("✨ StatusCraft AI", centerX, canvasH - 70);
     ctx.globalAlpha = 1;
 
 
@@ -834,7 +851,9 @@ function setupResultActions() {
     downloadBtn.onclick = function () {
 
       const link = document.createElement("a");
-      link.download = "StatusCraftAI-Status.jpg";
+      const formatKey =
+        document.getElementById("format")?.value || "square";
+      link.download = "StatusCraftAI-" + formatKey + ".jpg";
       link.href = generatedImageUrl;
       document.body.appendChild(link);
       link.click();
