@@ -274,5 +274,97 @@
       "Good vibes, good people — bas yehi chahiye celebration ke liye.",
       "Khushiyan share karo, wo aur badh jaati hain."
     ]
+  },
+  "Missing Someone": {
+    "English": [
+      "Missing you is a quiet kind of ache that never really leaves.",
+      "Some people stay in our thoughts long after they leave our days.",
+      "I catch myself looking for you in the smallest things.",
+      "Distance doesn't stop the missing, it just makes it louder.",
+      "Wherever you are, a part of me is thinking of you right now."
+    ],
+    "Hindi": [
+      "तेरी कमी हर पल महसूस होती है, चाहे कितना भी छुपा लूं।",
+      "याद तेरी आती है, बस बताने का हौसला नहीं होता।",
+      "दूर हो तुम, फिर भी हर सोच में तुम ही तुम हो।",
+      "कुछ लोग दूर होकर भी दिल के करीब रहते हैं।",
+      "तेरे बिना हर जगह अधूरी सी लगती है।"
+    ],
+    "Hinglish": [
+      "Teri yaad aati hai, bas keh nahi paata.",
+      "Dur ho tum mujhse, par dil ke paas ho hamesha.",
+      "Har jagah tumhari kami mehsoos hoti hai.",
+      "Kabhi kabhi bas tumhe dekhne ka mann karta hai.",
+      "Tum door ho, lekin socho toh hamesha paas lagte ho."
+    ]
+  },
+  "Lonely": {
+    "English": [
+      "Being alone taught me things company never could.",
+      "Some silences are heavier than any noise.",
+      "Loneliness is loud even when the room is quiet.",
+      "I've learned to sit with myself, even when it's hard.",
+      "Solitude isn't always sad — sometimes it's just quiet."
+    ],
+    "Hindi": [
+      "अकेलापन कभी-कभी सबसे बड़ी सच्चाई सिखा देता है।",
+      "भीड़ में भी कभी-कभी बहुत अकेला महसूस होता है।",
+      "खामोशी कभी-कभी शोर से भी भारी होती है।",
+      "खुद के साथ रहना भी एक कला है, सीखनी पड़ती है।",
+      "तन्हाई हमेशा बुरी नहीं होती, कभी-कभी सुकून भी देती है।"
+    ],
+    "Hinglish": [
+      "Akela hona kabhi kabhi bahut kuch sikha jaata hai.",
+      "Bheed mein bhi kabhi kabhi bahut tanha lagta hai.",
+      "Khamoshi kabhi shor se bhi zyada bhaari hoti hai.",
+      "Khud ke saath rehna bhi ek practice hai.",
+      "Tanhai hamesha buri nahi hoti, kabhi sukoon bhi deti hai."
+    ]
+  },
+  "Funny": {
+    "English": [
+      "I'm not lazy, I'm just on my energy-saving mode.",
+      "My bed is a magical place where I remember everything I forgot to do.",
+      "I run on coffee, chaos, and mild sarcasm.",
+      "Adulting is just googling how to do things and hoping for the best.",
+      "I'm on a seafood diet — I see food and I eat it."
+    ],
+    "Hindi": [
+      "मैं आलसी नहीं हूँ, बस energy save कर रहा हूँ।",
+      "मेरा bed वो जगह है जहाँ मुझे सब भूले हुए काम याद आते हैं।",
+      "चाय और थोड़ा नाटक — यही मेरी daily diet है।",
+      "Adulting matlab Google pe search karke guess karna।",
+      "मेरा dimaag WiFi jaisa hai — kabhi connect, kabhi nahi।"
+    ],
+    "Hinglish": [
+      "Main lazy nahi hoon, bas battery save mode mein hoon.",
+      "Mera bed ek magic jagah hai jaha sab kaam yaad aate hain.",
+      "Chai aur thoda drama — bas yehi meri daily diet hai.",
+      "Adulting matlab Google pe search karke andaza lagana.",
+      "Mera dimaag WiFi jaisa hai, kabhi connect kabhi nahi."
+    ]
+  },
+  "Royal": {
+    "English": [
+      "I don't compete, I dominate with class.",
+      "Born to stand out, not to fit in.",
+      "My crown may be invisible, but everyone can feel it.",
+      "Royalty isn't a title, it's how you carry yourself.",
+      "I walk like I own the place, because in my world, I do."
+    ],
+    "Hindi": [
+      "अंदाज़ शाही है, सोच भी उतनी ही ऊँची है।",
+      "ताज नज़र नहीं आता, पर रुतबा हर कोई महसूस करता है।",
+      "मैं भीड़ का हिस्सा नहीं, अपनी अलग पहचान हूँ।",
+      "चाल में गुरूर हो तो शब्दों की ज़रूरत नहीं पड़ती।",
+      "जो खुद का सम्मान करता है, वही असली राजा है।"
+    ],
+    "Hinglish": [
+      "Andaaz shahi hai, soch bhi utni hi high hai.",
+      "Taj dikhta nahi, par rutba sab mehsoos karte hain.",
+      "Main bheed ka hissa nahi, apni alag pehchaan hoon.",
+      "Chaal mein confidence ho toh words ki zaroorat nahi.",
+      "Jo khud ki respect karta hai, wahi asli raja hai."
+    ]
   }
 }
