@@ -280,6 +280,35 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
   // ------------------------------------
+  // 🆕 Mood emoji chips — tap karte hi category
+  // set ho aur turant naya quote generate ho
+  // ------------------------------------
+
+  const moodChips = document.querySelectorAll(".moodChip");
+  const categorySelect = document.getElementById("category");
+
+  moodChips.forEach(function (chip) {
+
+    chip.addEventListener("click", async function () {
+
+      const category = chip.getAttribute("data-category");
+
+      if (categorySelect && category) {
+        categorySelect.value = category;
+      }
+
+      // Active state — sirf ek chip highlight ho
+      moodChips.forEach(function (c) { c.classList.remove("active"); });
+      chip.classList.add("active");
+
+      if (getQuoteBtn) {
+        getQuoteBtn.click();
+      }
+    });
+  });
+
+
+  // ------------------------------------
   // Create My Status
   // ------------------------------------
 
