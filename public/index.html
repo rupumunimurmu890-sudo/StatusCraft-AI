@@ -132,13 +132,46 @@
   }
   html.dark-mode .dailyQuoteText { color: #eee; }
 
-  /* 🆕 CLS fix — previewFrame ke liye fixed jagah reserve
-     karo taaki image load hone pe box jump na kare */
+  /* 🆕 CLS fix v2 — previewFrame ko FIXED height do (min-height
+     nahi), aur image ko object-fit se andar fit karo. Ab chahe
+     format square ho ya lamba status/story, frame ka size kabhi
+     nahi badlega. */
   .previewFrame {
-    min-height: 420px;
+    height: 460px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
   }
   @media (min-width: 640px) {
-    .previewFrame { min-height: 520px; }
+    .previewFrame { height: 560px; }
+  }
+  .previewFrame img#generatedStatus {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* 🆕 CLS fix v2 — AI Edit row aur Recent Creations ab
+     display:none/block toggle nahi hote. visibility:hidden use
+     karte hain (max-height collapse nahi) taaki yeh hamesha apni
+     poori jagah reserve karke rakhein — content baad mein aane
+     par bhi neeche ka footer shift na ho. */
+  .aiEditRow,
+  .recentCreations {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease;
+  }
+  .aiEditRow.isVisible,
+  .recentCreations.isVisible {
+    opacity: 1;
+    visibility: visible;
+  }
+  .recentCreationsRow {
+    min-height: 64px;
   }
 
   /* 🆕 CLS fix — Daily Inspiration box hamesha apni jagah
@@ -685,7 +718,7 @@
       </div>
 
       <!-- 🆕 AI Edit quick actions -->
-      <div id="aiEditRow" class="aiEditRow" style="display:none;">
+      <div id="aiEditRow" class="aiEditRow">
         <span class="aiEditLabel">✨ AI Edit</span>
         <button type="button" id="editEmotionalBtn" class="aiEditChip">More Emotional</button>
         <button type="button" id="editPowerfulBtn" class="aiEditChip">More Powerful</button>
@@ -694,7 +727,7 @@
       </div>
 
       <!-- 🆕 Recent Creations gallery -->
-      <div id="recentCreations" class="recentCreations" style="display:none;">
+      <div id="recentCreations" class="recentCreations">
         <div class="recentCreationsLabel">🖼️ Recent Creations</div>
         <div id="recentCreationsRow" class="recentCreationsRow"></div>
       </div>
