@@ -449,7 +449,11 @@ async function generateStatus() {
 
   if (!currentQuote) {
 
-    alert("पहले 'Generate Quote' दबाएं।");
+    if (window.showToast) {
+      window.showToast("पहले 'Generate Quote' दबाएं।", "error");
+    } else {
+      alert("पहले 'Generate Quote' दबाएं।");
+    }
     return;
   }
 
@@ -463,6 +467,12 @@ async function generateStatus() {
     button.disabled = true;
     button.innerHTML =
       '<span class="spinner"></span> Status बना रहा है...';
+  }
+
+  // 🆕 Preview area mein pulse animation dikhao jab tak status ban raha hai
+  const previewFrameEl = document.getElementById("previewFrame");
+  if (previewFrameEl) {
+    previewFrameEl.classList.add("skeletonPulse");
   }
 
   try {
@@ -786,6 +796,13 @@ async function generateStatus() {
     if (resultImg) {
       resultImg.src = generatedImageUrl;
       resultImg.style.display = "block";
+      resultImg.classList.remove("fadeInImg");
+      void resultImg.offsetWidth; // reflow force karo taaki animation dobara chale
+      resultImg.classList.add("fadeInImg");
+    }
+
+    if (previewFrameEl) {
+      previewFrameEl.classList.remove("skeletonPulse");
     }
 
     if (previewPlaceholder) {
@@ -816,15 +833,23 @@ async function generateStatus() {
 
     console.error("StatusCraft Generate Error:", error);
 
-    alert(
-      "❌ Status बनाने में समस्या हुई:\n\n" + error.message
-    );
+    if (window.showToast) {
+      window.showToast("Status बनाने में समस्या हुई: " + error.message, "error");
+    } else {
+      alert(
+        "❌ Status बनाने में समस्या हुई:\n\n" + error.message
+      );
+    }
 
   } finally {
 
     if (button) {
       button.disabled = false;
       button.innerHTML = originalButtonHtml;
+    }
+
+    if (previewFrameEl) {
+      previewFrameEl.classList.remove("skeletonPulse");
     }
   }
 }
@@ -889,13 +914,21 @@ function setupResultActions() {
 
       } else {
 
-        alert("इस browser में sharing उपलब्ध नहीं है। पहले Download करें।");
+        if (window.showToast) {
+          window.showToast("इस browser में sharing उपलब्ध नहीं है। पहले Download करें।", "info");
+        } else {
+          alert("इस browser में sharing उपलब्ध नहीं है। पहले Download करें।");
+        }
       }
 
     } catch (shareError) {
 
       if (shareError.name !== "AbortError") {
-        alert("❌ Status share नहीं हो पाया।");
+        if (window.showToast) {
+          window.showToast("Status share नहीं हो पाया।", "error");
+        } else {
+          alert("❌ Status share नहीं हो पाया।");
+        }
       }
     }
   }
