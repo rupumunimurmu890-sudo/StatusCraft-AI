@@ -26,6 +26,11 @@
 
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 
+<!-- 🆕 Custom fonts for elegant quote typography -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Tiro+Devanagari+Hindi&family=Tiro+Bangla&family=Noto+Serif+Gujarati:wght@700&family=Noto+Serif+Gurmukhi:wght@700&family=Noto+Serif+Tamil:wght@700&family=Noto+Serif+Telugu:wght@700&family=Noto+Serif+Kannada:wght@700&family=Noto+Serif+Malayalam:wght@700&family=Noto+Serif+Oriya:wght@700&family=Noto+Nastaliq+Urdu:wght@700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -142,6 +147,124 @@
   .dailyInspiration {
     min-height: 84px;
   }
+
+  /* 🆕 Fonts */
+  .brandName, .heroTitle { font-family: 'Poppins', -apple-system, sans-serif; }
+
+  /* 🆕 Hero section */
+  .hero {
+    max-width: 900px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+    text-align: center;
+  }
+  .heroTitle {
+    font-size: 26px;
+    font-weight: 800;
+    color: #1f6f54;
+    margin: 0 0 6px;
+  }
+  html.dark-mode .heroTitle { color: #4fd8ab; }
+  .heroSubtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 18px;
+  }
+  html.dark-mode .heroSubtitle { color: #aaa; }
+
+  .sampleShowcase {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+  .sampleCard {
+    position: relative;
+    flex: 0 0 180px;
+    height: 180px;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+  .sampleCard--purple { background: linear-gradient(135deg, #3a1c71, #7b4de0); }
+  .sampleCard--sunset { background: linear-gradient(135deg, #ff512f, #f09819); }
+  .sampleCard--gold { background: linear-gradient(135deg, #bf953f, #3a2c0f); }
+  .sampleQuoteMark {
+    position: absolute;
+    top: 6px;
+    left: 12px;
+    font-size: 60px;
+    font-family: Georgia, serif;
+    color: #ffffff;
+    opacity: 0.2;
+  }
+  .sampleCardText {
+    position: relative;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  /* 🆕 AI Edit quick actions */
+  .aiEditRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+  }
+  .aiEditLabel {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #888;
+    margin-right: 4px;
+  }
+  .aiEditChip {
+    border: 1.5px solid rgba(0,0,0,0.12);
+    background: #fff;
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  html.dark-mode .aiEditChip {
+    background: #232323;
+    color: #e9e9e9;
+    border-color: #3a3a3a;
+  }
+  html.dark-mode .aiEditLabel { color: #999; }
+
+  /* 🆕 Recent Creations gallery */
+  .recentCreations { margin-top: 18px; }
+  .recentCreationsLabel {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  html.dark-mode .recentCreationsLabel { color: #999; }
+  .recentCreationsRow {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .recentCreationThumb {
+    flex: 0 0 64px;
+    height: 64px;
+    border-radius: 10px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 1.5px solid rgba(0,0,0,0.1);
+  }
+  html.dark-mode .recentCreationThumb { border-color: #3a3a3a; }
 
   /* 🆕 Dark mode toggle button */
   .themeToggleBtn {
@@ -292,6 +415,26 @@
       </button>
     </div>
   </header>
+
+  <section class="hero">
+    <h1 class="heroTitle">Create what you feel.</h1>
+    <p class="heroSubtitle">AI-powered quotes, shayari &amp; status images — in your language, in seconds.</p>
+
+    <div class="sampleShowcase">
+      <div class="sampleCard sampleCard--purple">
+        <span class="sampleQuoteMark">&#8220;</span>
+        <p class="sampleCardText">सपने वही सच होते हैं, जिनके लिए जागकर मेहनत की जाए। ✨</p>
+      </div>
+      <div class="sampleCard sampleCard--sunset">
+        <span class="sampleQuoteMark">&#8220;</span>
+        <p class="sampleCardText">Falling for you was the easiest thing I ever did. ❤️</p>
+      </div>
+      <div class="sampleCard sampleCard--gold">
+        <span class="sampleQuoteMark">&#8220;</span>
+        <p class="sampleCardText">Apna style khud banate hain, copy nahi karte. 😎</p>
+      </div>
+    </div>
+  </section>
 
   <div id="dailyInspiration" class="dailyInspiration skeletonPulse">
     <div class="dailyInspirationLabel">✨ Today's Inspiration</div>
@@ -539,6 +682,21 @@
           Create Another
         </button>
 
+      </div>
+
+      <!-- 🆕 AI Edit quick actions -->
+      <div id="aiEditRow" class="aiEditRow" style="display:none;">
+        <span class="aiEditLabel">✨ AI Edit</span>
+        <button type="button" id="editEmotionalBtn" class="aiEditChip">More Emotional</button>
+        <button type="button" id="editPowerfulBtn" class="aiEditChip">More Powerful</button>
+        <button type="button" id="editShorterBtn" class="aiEditChip">Make Shorter</button>
+        <button type="button" id="editRemoveNameBtn" class="aiEditChip">Remove Name</button>
+      </div>
+
+      <!-- 🆕 Recent Creations gallery -->
+      <div id="recentCreations" class="recentCreations" style="display:none;">
+        <div class="recentCreationsLabel">🖼️ Recent Creations</div>
+        <div id="recentCreationsRow" class="recentCreationsRow"></div>
       </div>
 
     </section>
