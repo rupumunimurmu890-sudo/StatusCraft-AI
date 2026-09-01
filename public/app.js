@@ -488,7 +488,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (!gallery || !row) return;
 
     if (list.length === 0) {
-      gallery.style.display = "none";
+      gallery.classList.remove("isVisible");
       return;
     }
 
@@ -520,7 +520,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       row.appendChild(img);
     });
 
-    gallery.style.display = "block";
+    gallery.classList.add("isVisible");
   }
 
   function saveToRecentCreations(dataUrl) {
@@ -1287,7 +1287,7 @@ async function generateStatus() {
     // 🆕 AI Edit row dikhao
     const aiEditRow = document.getElementById("aiEditRow");
     if (aiEditRow) {
-      aiEditRow.style.display = "flex";
+      aiEditRow.classList.add("isVisible");
     }
 
     // 🆕 Recent Creations gallery mein save karo
