@@ -4,6 +4,163 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type"
 };
 
+const STYLE_VARIATIONS = [
+  "Write it as a short, punchy one-liner.",
+  "Write it as a two-line poetic shayari with a natural rhythm.",
+  "Write it as a gentle, reflective thought.",
+  "Write it as a bold, energetic statement.",
+  "Write it using a nature or seasons metaphor.",
+  "Write it using a light/journey/path metaphor.",
+  "Write it as a heartfelt, conversational line, like talking to a close friend.",
+  "Write it with a subtle rhyme or wordplay.",
+  "Write it as a simple, everyday-life observation with deep meaning.",
+  "Write it as an uplifting message someone would send at sunrise."
+];
+
+// ------------------------------------
+// 🆕 Reusable quote-generation core —
+// /api/generate-quote aur /api/daily-quote
+// dono isi function ko use karte hain
+// ------------------------------------
+
+async function generateUniqueQuote(env, language, category, feeling, recentQuotes) {
+
+  const feelingLine = feeling
+    ? `The user currently feels: "${feeling}". Let this subtly shape the quote's tone.`
+    : "";
+
+  const randomStyle =
+    STYLE_VARIATIONS[
+      Math.floor(Math.random() * STYLE_VARIATIONS.length)
+    ];
+
+  const randomSeed =
+    Math.random().toString(36).slice(2, 10);
+
+  const kvKey = `quotes:${language}:${category}`;
+  const KV_LIST_LIMIT = 500;
+
+  let globalQuoteList = [];
+
+  if (env.QUOTES_KV) {
+
+    try {
+
+      const stored = await env.QUOTES_KV.get(kvKey);
+      globalQuoteList = stored ? JSON.parse(stored) : [];
+
+    } catch (kvReadError) {
+
+      console.error("KV read error:", kvReadError);
+      globalQuoteList = [];
+    }
+  }
+
+  const clientRecent =
+    Array.isArray(recentQuotes) ? recentQuotes : [];
+
+  const avoidList = Array.from(
+    new Set([
+      ...globalQuoteList.slice(-30),
+      ...clientRecent.slice(-20)
+    ])
+  );
+
+  const avoidBlock =
+    avoidList.length > 0
+      ? `
+
+The following quotes have already been shown to users. Do NOT repeat
+any of them, and do NOT write anything that closely resembles their
+wording or structure — generate something genuinely different:
+${avoidList.map(function (q) { return "- " + q; }).join("\n")}`
+      : "";
+
+  function buildPrompt() {
+
+    return `
+You are a quote-writing assistant for a status/shayari app called StatusCraft AI.
+
+Write ONE original, short, emotionally resonant quote in ${language}.
+
+Category / theme: ${category}
+${feelingLine}
+Style for this one: ${randomStyle}
+(variation id: ${randomSeed} — use this only to ensure freshness, do not mention it)
+${avoidBlock}
+
+RULES:
+- Output ONLY the quote text itself. No preamble, no explanation, no quotation marks, no author name.
+- Include 1-2 relevant emoji that match the mood/theme (e.g. ❤️ for love, 💪 for motivational, 🙏 for spiritual, ☀️ for good morning) — place them naturally at the start or end of the quote, not scattered randomly.
+- Keep it short enough for a mobile status image (max 2 lines / ~25 words), emoji included.
+- Do NOT attribute it to any real person — this must be an original line.
+- Do NOT reuse common, overused, cliché quotes — make it feel fresh and specific.
+- Write the quote in the NATIVE SCRIPT of the specified language (for example: Devanagari for Hindi/Marathi/Nepali/Sanskrit/Konkani/Maithili/Dogri/Bodo, Bengali script for Bengali/Assamese, Gurmukhi for Punjabi, Gujarati script for Gujarati, Tamil script for Tamil, Telugu script for Telugu, Kannada script for Kannada, Malayalam script for Malayalam, Odia script for Odia, Perso-Arabic script for Urdu/Sindhi/Kashmiri, Ol Chiki for Santali, Meitei Mayek or Bengali script for Manipuri).
+- Exception: if the language is exactly "Hinglish", write Hindi words using Roman/English letters instead of Devanagari.
+- If you are not fully confident in a requested language's script, still write a warm, correct quote in that language using its most commonly used script, rather than falling back to Hindi or English.
+- Make it feel warm, human, and fresh — avoid generic clichés.
+`;
+  }
+
+  let quoteText = null;
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+
+    const result = await env.AI.run(
+      "@cf/meta/llama-3.1-8b-instruct",
+      {
+        messages: [
+          { role: "user", content: buildPrompt() }
+        ],
+        max_tokens: 120,
+        temperature: 1.3
+      }
+    );
+
+    const candidate = result?.response?.trim() || null;
+
+    const isDuplicate =
+      candidate &&
+      globalQuoteList.some(function (q) {
+        return q.trim() === candidate.trim();
+      });
+
+    if (candidate && !isDuplicate) {
+      quoteText = candidate;
+      break;
+    }
+
+    quoteText = candidate;
+  }
+
+  if (env.QUOTES_KV && quoteText) {
+
+    try {
+
+      globalQuoteList.push(quoteText);
+
+      while (globalQuoteList.length > KV_LIST_LIMIT) {
+        globalQuoteList.shift();
+      }
+
+      await env.QUOTES_KV.put(
+        kvKey,
+        JSON.stringify(globalQuoteList)
+      );
+
+      const currentCount = await env.QUOTES_KV.get("stats:totalQuotes");
+      const newCount = (currentCount ? parseInt(currentCount, 10) || 0 : 0) + 1;
+      await env.QUOTES_KV.put("stats:totalQuotes", String(newCount));
+
+    } catch (kvWriteError) {
+
+      console.error("KV write error:", kvWriteError);
+    }
+  }
+
+  return quoteText;
+}
+
 export default {
   async fetch(request, env) {
 
@@ -50,7 +207,66 @@ export default {
     }
 
     // ========================================
-    // 📝 AI QUOTE GENERATION (NEW - Phase 2)
+    // 🌅 DAILY INSPIRATION — ek fixed quote
+    // pure din ke liye, sab users ko same dikhta hai
+    // ========================================
+
+    if (
+      url.pathname === "/api/daily-quote" &&
+      request.method === "GET"
+    ) {
+
+      try {
+
+        const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+        const dailyKey = `daily:${today}`;
+
+        if (env.QUOTES_KV) {
+
+          const cached = await env.QUOTES_KV.get(dailyKey);
+
+          if (cached) {
+            return Response.json(
+              { success: true, quote: cached, date: today },
+              { status: 200, headers: corsHeaders }
+            );
+          }
+        }
+
+        const quote = await generateUniqueQuote(
+          env,
+          "Hindi",
+          "Motivational",
+          "",
+          []
+        );
+
+        if (!quote) {
+          throw new Error("Daily quote generate nahi ho payi.");
+        }
+
+        if (env.QUOTES_KV) {
+          await env.QUOTES_KV.put(dailyKey, quote);
+        }
+
+        return Response.json(
+          { success: true, quote, date: today },
+          { status: 200, headers: corsHeaders }
+        );
+
+      } catch (error) {
+
+        console.error("Daily quote error:", error);
+
+        return Response.json(
+          { success: false, error: error?.message || String(error) },
+          { status: 500, headers: corsHeaders }
+        );
+      }
+    }
+
+    // ========================================
+    // 📝 AI QUOTE GENERATION (Phase 2)
     // ========================================
 
     if (
@@ -63,15 +279,11 @@ export default {
         const body = await request.json();
 
         const {
-          language,   // e.g. "Hindi", "English", "Hinglish"
-          category,   // e.g. "Motivational", "Love", "Friendship"
-          feeling,    // optional free-text mood from the user
-          recentQuotes // 🆕 array of quotes already shown to this user
+          language,
+          category,
+          feeling,
+          recentQuotes
         } = body;
-
-        // ------------------------------------
-        // Validation
-        // ------------------------------------
 
         if (!language || !category) {
 
@@ -88,185 +300,13 @@ export default {
 
         }
 
-        // ------------------------------------
-        // 🎯 PROMPT
-        // ------------------------------------
-
-        const feelingLine = feeling
-          ? `The user currently feels: "${feeling}". Let this subtly shape the quote's tone.`
-          : "";
-
-        // ------------------------------------
-        // 🎲 Random style angle — har request pe
-        // alag style force karo taaki quotes
-        // baar-baar repeat/similar na lagein
-        // ------------------------------------
-
-        const STYLE_VARIATIONS = [
-          "Write it as a short, punchy one-liner.",
-          "Write it as a two-line poetic shayari with a natural rhythm.",
-          "Write it as a gentle, reflective thought.",
-          "Write it as a bold, energetic statement.",
-          "Write it using a nature or seasons metaphor.",
-          "Write it using a light/journey/path metaphor.",
-          "Write it as a heartfelt, conversational line, like talking to a close friend.",
-          "Write it with a subtle rhyme or wordplay.",
-          "Write it as a simple, everyday-life observation with deep meaning.",
-          "Write it as an uplifting message someone would send at sunrise."
-        ];
-
-        const randomStyle =
-          STYLE_VARIATIONS[
-            Math.floor(Math.random() * STYLE_VARIATIONS.length)
-          ];
-
-        // Randomness seed — model ko har baar naya context
-        // dikhta hai, isse cache-jaisa repeat kam hota hai
-        const randomSeed =
-          Math.random().toString(36).slice(2, 10);
-
-        // ------------------------------------
-        // 🆕 GLOBAL duplicate check — KV se
-        // (sirf is user ka history nahi, PURE APP
-        // ke saare users ke quotes is language+category
-        // ke liye yaha store hote hain)
-        // ------------------------------------
-
-        const kvKey = `quotes:${language}:${category}`;
-        const KV_LIST_LIMIT = 500;
-
-        let globalQuoteList = [];
-
-        if (env.QUOTES_KV) {
-
-          try {
-
-            const stored = await env.QUOTES_KV.get(kvKey);
-            globalQuoteList = stored ? JSON.parse(stored) : [];
-
-          } catch (kvReadError) {
-
-            console.error("KV read error:", kvReadError);
-            globalQuoteList = [];
-          }
-        }
-
-        // AI ko dikhane ke liye — global list se latest kuch
-        // + client ne jo bheja (recentQuotes) dono milakar
-        const clientRecent =
-          Array.isArray(recentQuotes) ? recentQuotes : [];
-
-        const avoidList = Array.from(
-          new Set([
-            ...globalQuoteList.slice(-30),
-            ...clientRecent.slice(-20)
-          ])
+        const quoteText = await generateUniqueQuote(
+          env,
+          language,
+          category,
+          feeling,
+          recentQuotes
         );
-
-        const avoidBlock =
-          avoidList.length > 0
-            ? `
-
-The following quotes have already been shown to users. Do NOT repeat
-any of them, and do NOT write anything that closely resembles their
-wording or structure — generate something genuinely different:
-${avoidList.map(function (q) { return "- " + q; }).join("\n")}`
-            : "";
-
-        function buildPrompt() {
-
-          return `
-You are a quote-writing assistant for a status/shayari app called StatusCraft AI.
-
-Write ONE original, short, emotionally resonant quote in ${language}.
-
-Category / theme: ${category}
-${feelingLine}
-Style for this one: ${randomStyle}
-(variation id: ${randomSeed} — use this only to ensure freshness, do not mention it)
-${avoidBlock}
-
-RULES:
-- Output ONLY the quote text itself. No preamble, no explanation, no quotation marks, no author name.
-- Include 1-2 relevant emoji that match the mood/theme (e.g. ❤️ for love, 💪 for motivational, 🙏 for spiritual, ☀️ for good morning) — place them naturally at the start or end of the quote, not scattered randomly.
-- Keep it short enough for a mobile status image (max 2 lines / ~25 words), emoji included.
-- Do NOT attribute it to any real person — this must be an original line.
-- Do NOT reuse common, overused, cliché quotes — make it feel fresh and specific.
-- Write the quote in the NATIVE SCRIPT of the specified language (for example: Devanagari for Hindi/Marathi/Nepali/Sanskrit/Konkani/Maithili/Dogri/Bodo, Bengali script for Bengali/Assamese, Gurmukhi for Punjabi, Gujarati script for Gujarati, Tamil script for Tamil, Telugu script for Telugu, Kannada script for Kannada, Malayalam script for Malayalam, Odia script for Odia, Perso-Arabic script for Urdu/Sindhi/Kashmiri, Ol Chiki for Santali, Meitei Mayek or Bengali script for Manipuri).
-- Exception: if the language is exactly "Hinglish", write Hindi words using Roman/English letters instead of Devanagari.
-- If you are not fully confident in a requested language's script, still write a warm, correct quote in that language using its most commonly used script, rather than falling back to Hindi or English.
-- Make it feel warm, human, and fresh — avoid generic clichés.
-`;
-        }
-
-        // ------------------------------------
-        // 🤖 CLOUDFLARE WORKERS AI (Llama)
-        // 🆕 Retry up to 3 baar agar output kisi
-        // bhi purane global quote se exact match kare
-        // ------------------------------------
-
-        let quoteText = null;
-
-        for (let attempt = 0; attempt < 3; attempt++) {
-
-          const result = await env.AI.run(
-            "@cf/meta/llama-3.1-8b-instruct",
-            {
-              messages: [
-                { role: "user", content: buildPrompt() }
-              ],
-              max_tokens: 120,
-              temperature: 1.3
-            }
-          );
-
-          const candidate = result?.response?.trim() || null;
-
-          const isDuplicate =
-            candidate &&
-            globalQuoteList.some(function (q) {
-              return q.trim() === candidate.trim();
-            });
-
-          if (candidate && !isDuplicate) {
-            quoteText = candidate;
-            break;
-          }
-
-          quoteText = candidate; // last attempt ka result rakh lo, fallback ke liye
-        }
-
-        // ------------------------------------
-        // 🆕 Naya quote global list mein save karo
-        // (KV mein) — taaki agla koi bhi user isse
-        // dobara na paye
-        // ------------------------------------
-
-        if (env.QUOTES_KV && quoteText) {
-
-          try {
-
-            globalQuoteList.push(quoteText);
-
-            while (globalQuoteList.length > KV_LIST_LIMIT) {
-              globalQuoteList.shift();
-            }
-
-            await env.QUOTES_KV.put(
-              kvKey,
-              JSON.stringify(globalQuoteList)
-            );
-
-            // 🆕 Total counter badhao
-            const currentCount = await env.QUOTES_KV.get("stats:totalQuotes");
-            const newCount = (currentCount ? parseInt(currentCount, 10) || 0 : 0) + 1;
-            await env.QUOTES_KV.put("stats:totalQuotes", String(newCount));
-
-          } catch (kvWriteError) {
-
-            console.error("KV write error:", kvWriteError);
-          }
-        }
 
         if (!quoteText) {
 
@@ -275,10 +315,6 @@ RULES:
           );
 
         }
-
-        // ------------------------------------
-        // RESPONSE
-        // ------------------------------------
 
         return Response.json(
           {
@@ -331,7 +367,8 @@ RULES:
 
         const {
           quote,
-          category
+          category,
+          style // 🆕 e.g. "cinematic", "artistic", "dark", "luxury", "nature", "minimal", "dreamy", "photorealistic"
         } = body;
 
 
@@ -356,6 +393,25 @@ RULES:
 
 
         // ------------------------------------
+        // 🆕 Style ke hisaab se extra visual direction
+        // ------------------------------------
+
+        const STYLE_DIRECTIONS = {
+          cinematic: "Cinematic film-still quality, dramatic lighting, wide dynamic range, movie-poster feel.",
+          photorealistic: "Ultra photorealistic, DSLR photograph quality, natural lighting and textures.",
+          artistic: "Painterly, artistic illustration style, expressive brushwork-like quality.",
+          dark: "Moody, dark and mysterious tones, low-key lighting, dramatic shadows.",
+          luxury: "Premium, luxurious aesthetic — gold accents, elegant textures, high-end feel.",
+          nature: "Lush natural scenery, organic textures, soft natural light.",
+          minimal: "Minimal, clean, uncluttered composition with lots of negative space.",
+          dreamy: "Soft dreamy haze, pastel tones, gentle bokeh, ethereal atmosphere."
+        };
+
+        const styleDirection =
+          STYLE_DIRECTIONS[style] || "";
+
+
+        // ------------------------------------
         // 🎯 PROMPT — quote ke mood/meaning
         // ke hisaab se ek matching scene
         // ------------------------------------
@@ -368,6 +424,7 @@ QUOTE (do not render this text in the image, only capture its feeling):
 "${quote}"
 
 CATEGORY / MOOD: ${category || "general inspiration"}
+${styleDirection ? "VISUAL STYLE: " + styleDirection : ""}
 
 IMPORTANT:
 - Do NOT include any text, letters or words in the image.
