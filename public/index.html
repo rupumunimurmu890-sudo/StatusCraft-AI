@@ -45,6 +45,13 @@
     cursor: pointer;
   }
   .installBtn:hover { background: #17573f; }
+  .statsCounter {
+    text-align: center;
+    font-size: 13px;
+    color: #777;
+    margin: 8px 0 0;
+  }
+  html.dark-mode .statsCounter { color: #999; }
 
   /* 🆕 Dark mode toggle button */
   .themeToggleBtn {
@@ -277,6 +284,14 @@
 
       </div>
 
+      <div class="field">
+        <label for="feeling">
+          <svg class="fieldIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>
+          Aaj kaisa feel ho raha hai? (optional)
+        </label>
+        <input type="text" id="feeling" placeholder="Example: khush, thaka hua, umeed se bhara">
+      </div>
+
       <button type="button" id="getQuoteBtn" class="secondaryBtn">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z"/></svg>
         Generate Quote
@@ -377,6 +392,10 @@
     </section>
 
   </main>
+
+  <p id="statsCounter" class="statsCounter" style="display:none;">
+    ✨ <span id="statsCount">0</span> status created so far
+  </p>
 
   <p class="footer">
     ✨ StatusCraft AI &nbsp;·&nbsp; © 2026
