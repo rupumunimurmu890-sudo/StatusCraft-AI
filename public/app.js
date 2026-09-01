@@ -374,21 +374,21 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   (async function loadDailyInspiration() {
 
+    const dailyBox = document.getElementById("dailyInspiration");
+    const dailyText = document.getElementById("dailyQuoteText");
+    const useDailyBtn = document.getElementById("useDailyQuoteBtn");
+
     try {
 
       const response = await fetch("/api/daily-quote");
       const data = await response.json();
 
-      const dailyBox = document.getElementById("dailyInspiration");
-      const dailyText = document.getElementById("dailyQuoteText");
-      const useDailyBtn = document.getElementById("useDailyQuoteBtn");
-
-      if (data && data.success && data.quote && dailyBox && dailyText) {
+      if (data && data.success && data.quote && dailyText) {
 
         dailyText.textContent = data.quote;
-        dailyBox.style.display = "block";
 
         if (useDailyBtn) {
+          useDailyBtn.style.visibility = "visible";
 
           useDailyBtn.addEventListener("click", function () {
 
@@ -404,11 +404,27 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
           });
         }
+
+      } else if (dailyText) {
+
+        dailyText.textContent = "✨ Aaj ka quote generate karo aur inspire ho!";
       }
 
     } catch (error) {
 
       console.error("Daily inspiration load error:", error);
+
+      if (dailyText) {
+        dailyText.textContent = "✨ Aaj ka quote generate karo aur inspire ho!";
+      }
+
+    } finally {
+
+      // 🆕 Loading pulse hata do — box ki height same rehti hai,
+      // isliye koi layout shift nahi hota
+      if (dailyBox) {
+        dailyBox.classList.remove("skeletonPulse");
+      }
     }
   })();
 
