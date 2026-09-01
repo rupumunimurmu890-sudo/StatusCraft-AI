@@ -105,6 +105,10 @@ async function fetchAIQuote() {
   const language =
     document.getElementById("language")?.value || "Hindi";
 
+  // 🆕 User ka mood/feeling (optional)
+  const feeling =
+    document.getElementById("feeling")?.value.trim() || "";
+
   // Recent history bhej rahe hain taaki AI repeat na kare
   const recentQuotes = getQuoteHistory().slice(-20);
 
@@ -116,6 +120,7 @@ async function fetchAIQuote() {
     body: JSON.stringify({
       language,
       category,
+      feeling,
       recentQuotes
     })
   });
@@ -127,6 +132,9 @@ async function fetchAIQuote() {
   }
 
   addToQuoteHistory(data.quote);
+
+  // 🆕 Har naye quote ke baad counter refresh karo
+  refreshStatsCounter();
 
   return data.quote;
 }
@@ -151,9 +159,37 @@ async function getNewQuote() {
 }
 
 
+// ------------------------------------
+// 🆕 Live counter — total status generated
+// ------------------------------------
+
+async function refreshStatsCounter() {
+
+  try {
+
+    const response = await fetch("/api/stats");
+    const data = await response.json();
+
+    const counterEl = document.getElementById("statsCounter");
+    const countEl = document.getElementById("statsCount");
+
+    if (data && typeof data.count === "number" && countEl && counterEl) {
+      countEl.textContent = data.count.toLocaleString("en-IN");
+      counterEl.style.display = "block";
+    }
+
+  } catch (error) {
+
+    console.error("Stats fetch error:", error);
+  }
+}
+
+
 document.addEventListener("DOMContentLoaded", async function () {
 
   await loadQuotes();
+
+  refreshStatsCounter();
 
   const quoteText =
     document.getElementById("quoteText");
