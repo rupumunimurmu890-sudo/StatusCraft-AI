@@ -316,36 +316,100 @@ const TEMPLATE_COLORS = {
     from: "#3a1c71",
     to: "#7b4de0",
     text: "#ffffff",
-    accent: "#f6c453"
+    accent: "#f6c453",
+    highlights: ["#f6c453", "#ff8fa3", "#8ee6c9", "#c9a7ff"]
   },
 
   sunset: {
     from: "#ff512f",
     to: "#f09819",
     text: "#ffffff",
-    accent: "#ffe9c7"
+    accent: "#ffe9c7",
+    highlights: ["#ffe9c7", "#ffd166", "#06d6a0", "#ff8fa3"]
   },
 
   ocean: {
     from: "#005c97",
     to: "#363795",
     text: "#ffffff",
-    accent: "#8fd3f4"
+    accent: "#8fd3f4",
+    highlights: ["#8fd3f4", "#ffd166", "#f6c453", "#a8ffce"]
   },
 
   gold: {
     from: "#bf953f",
     to: "#3a2c0f",
     text: "#ffffff",
-    accent: "#fcf6ba"
+    accent: "#fcf6ba",
+    highlights: ["#fcf6ba", "#ff8fa3", "#8ee6c9", "#f6c453"]
   }
 
 };
 
 
 // ------------------------------------
-// Line wrap helper (canvas text wrap)
+// 🆕 Line ko multi-color words ke saath draw karo
+// (kuch words random highlight color mein, baaki
+// normal text color mein — sundar/eye-catching look)
 // ------------------------------------
+
+function drawStyledLine(ctx, line, centerX, y, textColor, highlightColors) {
+
+  const words = line.split(" ").filter(function (w) { return w.length > 0; });
+
+  if (words.length === 0) return;
+
+  // Kaunse words highlight honge — roughly 30-40% words,
+  // kam se kam 1 (agar line mein 2+ words hain)
+  const highlightCount =
+    words.length > 1
+      ? Math.max(1, Math.round(words.length * 0.35))
+      : 0;
+
+  const indices = words.map(function (_, i) { return i; });
+
+  // Shuffle karke pehle N indices highlight ke liye le lo
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  const highlightSet = new Set(indices.slice(0, highlightCount));
+
+  const spaceWidth = ctx.measureText(" ").width;
+
+  const wordWidths = words.map(function (w) {
+    return ctx.measureText(w).width;
+  });
+
+  const totalWidth =
+    wordWidths.reduce(function (a, b) { return a + b; }, 0) +
+    spaceWidth * (words.length - 1);
+
+  const originalAlign = ctx.textAlign;
+  ctx.textAlign = "left";
+
+  let x = centerX - totalWidth / 2;
+
+  words.forEach(function (word, i) {
+
+    if (highlightSet.has(i)) {
+      const randomColor =
+        highlightColors[
+          Math.floor(Math.random() * highlightColors.length)
+        ];
+      ctx.fillStyle = randomColor;
+    } else {
+      ctx.fillStyle = textColor;
+    }
+
+    ctx.fillText(word, x, y);
+
+    x += wordWidths[i] + spaceWidth;
+  });
+
+  ctx.textAlign = originalAlign;
+}
 
 function wrapText(ctx, text, maxWidth) {
 
@@ -639,7 +703,14 @@ async function generateStatus() {
     }
 
     lines.forEach(function (line, i) {
-      ctx.fillText(line, 540, startY + (i * lineHeight));
+      drawStyledLine(
+        ctx,
+        line,
+        540,
+        startY + (i * lineHeight),
+        colors.text,
+        colors.highlights
+      );
     });
 
     // Shadow reset — neeche ke elements (name) par asar na ho
