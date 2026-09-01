@@ -14,5 +14,12 @@
 
   "ai": {
     "binding": "AI"
-  }
+  },
+
+  "kv_namespaces": [
+    {
+      "binding": "QUOTES_KV",
+      "id": "28fb8c16d0fa4f13aee16b2c47bc9a93"
+    }
+  ]
 }
