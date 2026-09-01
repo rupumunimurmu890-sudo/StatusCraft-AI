@@ -97,7 +97,7 @@ function addToQuoteHistory(quote) {
 // 🆕 AI quote — worker ke /api/generate-quote se
 // ------------------------------------
 
-async function fetchAIQuote() {
+async function fetchAIQuote(instruction) {
 
   const category =
     document.getElementById("category")?.value || "Motivational";
@@ -116,7 +116,8 @@ async function fetchAIQuote() {
     language,
     category,
     feeling,
-    recentQuotes
+    recentQuotes,
+    instruction: instruction || undefined
   });
 
   // 🆕 Automatic retry — network/AI hiccup ho toh
@@ -169,11 +170,11 @@ async function fetchAIQuote() {
 // 🆕 AI try karo, fail ho toh static fallback
 // ------------------------------------
 
-async function getNewQuote() {
+async function getNewQuote(instruction) {
 
   try {
 
-    return await fetchAIQuote();
+    return await fetchAIQuote(instruction);
 
   } catch (error) {
 
@@ -430,6 +431,203 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
   // ------------------------------------
+  // 🆕 Recent Creations gallery (localStorage,
+  // small thumbnails, max 8 items)
+  // ------------------------------------
+
+  const RECENT_CREATIONS_KEY = "statuscraft_recent_creations";
+  const RECENT_CREATIONS_LIMIT = 8;
+
+  function makeThumbnail(dataUrl, callback) {
+
+    const img = new Image();
+
+    img.onload = function () {
+
+      const size = 150;
+      const thumbCanvas = document.createElement("canvas");
+      thumbCanvas.width = size;
+      thumbCanvas.height = size;
+
+      const tctx = thumbCanvas.getContext("2d");
+
+      const ratio = img.width / img.height;
+      let dw, dh, dx, dy;
+
+      if (ratio > 1) {
+        dh = size; dw = size * ratio;
+        dx = (size - dw) / 2; dy = 0;
+      } else {
+        dw = size; dh = size / ratio;
+        dx = 0; dy = (size - dh) / 2;
+      }
+
+      tctx.drawImage(img, dx, dy, dw, dh);
+      callback(thumbCanvas.toDataURL("image/jpeg", 0.6));
+    };
+
+    img.onerror = function () { callback(null); };
+    img.src = dataUrl;
+  }
+
+  function getRecentCreations() {
+    try {
+      const raw = localStorage.getItem(RECENT_CREATIONS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function renderRecentCreations() {
+
+    const list = getRecentCreations();
+    const gallery = document.getElementById("recentCreations");
+    const row = document.getElementById("recentCreationsRow");
+
+    if (!gallery || !row) return;
+
+    if (list.length === 0) {
+      gallery.style.display = "none";
+      return;
+    }
+
+    row.innerHTML = "";
+
+    list.forEach(function (thumb) {
+
+      const img = document.createElement("img");
+      img.src = thumb;
+      img.className = "recentCreationThumb";
+      img.title = "Open in preview";
+
+      img.addEventListener("click", function () {
+
+        const resultImg = document.getElementById("generatedStatus");
+        const previewPlaceholder = document.getElementById("previewPlaceholder");
+        const resultActions = document.getElementById("resultActions");
+
+        if (resultImg) {
+          resultImg.src = thumb;
+          resultImg.style.display = "block";
+        }
+        if (previewPlaceholder) previewPlaceholder.style.display = "none";
+        if (resultActions) resultActions.classList.add("show");
+
+        generatedImageUrl = thumb;
+      });
+
+      row.appendChild(img);
+    });
+
+    gallery.style.display = "block";
+  }
+
+  function saveToRecentCreations(dataUrl) {
+
+    makeThumbnail(dataUrl, function (thumbDataUrl) {
+
+      if (!thumbDataUrl) return;
+
+      try {
+
+        let list = getRecentCreations();
+        list.unshift(thumbDataUrl);
+
+        while (list.length > RECENT_CREATIONS_LIMIT) {
+          list.pop();
+        }
+
+        localStorage.setItem(RECENT_CREATIONS_KEY, JSON.stringify(list));
+        renderRecentCreations();
+
+      } catch (error) {
+        console.error("Recent creations save error:", error);
+      }
+    });
+  }
+
+  window.saveToRecentCreations = saveToRecentCreations;
+
+  renderRecentCreations();
+
+
+  // ------------------------------------
+  // 🆕 AI Edit quick actions
+  // ------------------------------------
+
+  async function runAiEdit(instruction, button) {
+
+    if (!button) return;
+
+    const originalHtml = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner"></span> ...';
+
+    try {
+
+      currentQuote = await getNewQuote(instruction);
+
+      if (quoteText) {
+        quoteText.textContent = currentQuote;
+      }
+
+      await generateStatus();
+
+    } catch (error) {
+
+      console.error("AI Edit error:", error);
+
+      if (window.showToast) {
+        window.showToast("AI Edit नहीं हो पाया, फिर try करें।", "error");
+      }
+
+    } finally {
+
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+  }
+
+  const editEmotionalBtn = document.getElementById("editEmotionalBtn");
+  const editPowerfulBtn = document.getElementById("editPowerfulBtn");
+  const editShorterBtn = document.getElementById("editShorterBtn");
+  const editRemoveNameBtn = document.getElementById("editRemoveNameBtn");
+
+  if (editEmotionalBtn) {
+    editEmotionalBtn.addEventListener("click", function () {
+      runAiEdit("Make it noticeably more emotional and heartfelt.", editEmotionalBtn);
+    });
+  }
+
+  if (editPowerfulBtn) {
+    editPowerfulBtn.addEventListener("click", function () {
+      runAiEdit("Make it more powerful, bold, and impactful.", editPowerfulBtn);
+    });
+  }
+
+  if (editShorterBtn) {
+    editShorterBtn.addEventListener("click", function () {
+      runAiEdit("Make it noticeably shorter and punchier, under 10 words including emoji.", editShorterBtn);
+    });
+  }
+
+  if (editRemoveNameBtn) {
+
+    editRemoveNameBtn.addEventListener("click", function () {
+
+      const nameInput = document.getElementById("userName");
+
+      if (nameInput) {
+        nameInput.value = "";
+      }
+
+      generateStatus();
+    });
+  }
+
+
+  // ------------------------------------
   // 🆕 Mood emoji chips — tap karte hi category
   // set ho aur turant naya quote generate ho
   // ------------------------------------
@@ -626,6 +824,54 @@ function drawStyledLine(ctx, line, centerX, y, textColor, highlightColors) {
   ctx.textAlign = originalAlign;
 }
 
+// ------------------------------------
+// 🆕 Language ke hisaab se sahi font family choose karo
+// (canvas text rendering ke liye)
+// ------------------------------------
+
+const LANGUAGE_FONTS = {
+  "Hindi": "'Tiro Devanagari Hindi', Georgia, serif",
+  "Marathi": "'Tiro Devanagari Hindi', Georgia, serif",
+  "Nepali": "'Tiro Devanagari Hindi', Georgia, serif",
+  "Sanskrit": "'Tiro Devanagari Hindi', Georgia, serif",
+  "Maithili": "'Tiro Devanagari Hindi', Georgia, serif",
+  "Konkani": "'Tiro Devanagari Hindi', Georgia, serif",
+  "Dogri": "'Tiro Devanagari Hindi', Georgia, serif",
+  "Bodo": "'Tiro Devanagari Hindi', Georgia, serif",
+  "Bengali": "'Tiro Bangla', Georgia, serif",
+  "Assamese": "'Tiro Bangla', Georgia, serif",
+  "Manipuri": "'Tiro Bangla', Georgia, serif",
+  "Gujarati": "'Noto Serif Gujarati', Georgia, serif",
+  "Punjabi": "'Noto Serif Gurmukhi', Georgia, serif",
+  "Tamil": "'Noto Serif Tamil', Georgia, serif",
+  "Telugu": "'Noto Serif Telugu', Georgia, serif",
+  "Kannada": "'Noto Serif Kannada', Georgia, serif",
+  "Malayalam": "'Noto Serif Malayalam', Georgia, serif",
+  "Odia": "'Noto Serif Oriya', Georgia, serif",
+  "Urdu": "'Noto Nastaliq Urdu', Georgia, serif",
+  "Sindhi": "'Noto Nastaliq Urdu', Georgia, serif",
+  "Kashmiri": "'Noto Nastaliq Urdu', Georgia, serif",
+  "English": "'Playfair Display', Georgia, serif",
+  "Hinglish": "'Playfair Display', Georgia, serif"
+};
+
+function getQuoteFontFamily(language) {
+  return LANGUAGE_FONTS[language] || "'Playfair Display', Georgia, serif";
+}
+
+async function ensureFontLoaded(fontFamily, weight) {
+
+  try {
+
+    const primaryFont = fontFamily.split(",")[0].trim();
+    await document.fonts.load((weight || "900") + " 76px " + primaryFont);
+
+  } catch (error) {
+
+    console.error("Font load error:", error);
+  }
+}
+
 function wrapText(ctx, text, maxWidth) {
 
   const words = text.split(" ");
@@ -694,6 +940,9 @@ async function generateStatus() {
 
     const templateKey =
       document.getElementById("templateStyle")?.value || "purple";
+
+    const language =
+      document.getElementById("language")?.value || "Hindi";
 
     const colors =
       TEMPLATE_COLORS[templateKey] || TEMPLATE_COLORS.purple;
@@ -928,7 +1177,10 @@ async function generateStatus() {
 
     ctx.fillStyle = colors.text;
     ctx.textAlign = "center";
-    ctx.font = "900 76px Georgia";
+
+    const quoteFontFamily = getQuoteFontFamily(language);
+    await ensureFontLoaded(quoteFontFamily, "900");
+    ctx.font = "900 76px " + quoteFontFamily;
 
     // Text ke peeche halka shadow — full-photo background par
     // bhi bold shayari saaf padhi jaye
@@ -1031,6 +1283,15 @@ async function generateStatus() {
     if (resultActions) {
       resultActions.classList.add("show");
     }
+
+    // 🆕 AI Edit row dikhao
+    const aiEditRow = document.getElementById("aiEditRow");
+    if (aiEditRow) {
+      aiEditRow.style.display = "flex";
+    }
+
+    // 🆕 Recent Creations gallery mein save karo
+    saveToRecentCreations(generatedImageUrl);
 
     // Preview panel tak smooth scroll (mobile par especially useful)
     const previewFrame =
