@@ -51,6 +51,49 @@ function getRandomQuote() {
 
 
 // ------------------------------------
+// 🆕 Quote history — repeat rokne ke liye
+// (localStorage mein last 50 quotes yaad rakhte hain)
+// ------------------------------------
+
+const QUOTE_HISTORY_KEY = "statuscraft_quote_history";
+const QUOTE_HISTORY_LIMIT = 50;
+
+function getQuoteHistory() {
+
+  try {
+
+    const raw = localStorage.getItem(QUOTE_HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [];
+
+  } catch (error) {
+
+    return [];
+  }
+}
+
+function addToQuoteHistory(quote) {
+
+  try {
+
+    const history = getQuoteHistory();
+
+    history.push(quote);
+
+    // Sirf latest 50 hi rakho, purane hata do
+    while (history.length > QUOTE_HISTORY_LIMIT) {
+      history.shift();
+    }
+
+    localStorage.setItem(QUOTE_HISTORY_KEY, JSON.stringify(history));
+
+  } catch (error) {
+
+    console.error("Quote history save error:", error);
+  }
+}
+
+
+// ------------------------------------
 // 🆕 AI quote — worker ke /api/generate-quote se
 // ------------------------------------
 
@@ -62,6 +105,9 @@ async function fetchAIQuote() {
   const language =
     document.getElementById("language")?.value || "Hindi";
 
+  // Recent history bhej rahe hain taaki AI repeat na kare
+  const recentQuotes = getQuoteHistory().slice(-20);
+
   const response = await fetch("/api/generate-quote", {
     method: "POST",
     headers: {
@@ -69,7 +115,8 @@ async function fetchAIQuote() {
     },
     body: JSON.stringify({
       language,
-      category
+      category,
+      recentQuotes
     })
   });
 
@@ -78,6 +125,8 @@ async function fetchAIQuote() {
   if (!response.ok || !data.success || !data.quote) {
     throw new Error(data?.error || "AI quote नहीं मिली।");
   }
+
+  addToQuoteHistory(data.quote);
 
   return data.quote;
 }
