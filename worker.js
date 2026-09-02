@@ -265,9 +265,13 @@ export default {
 
         console.error("Daily quote error:", error);
 
+        // 🆕 200 status — yeh ek expected/handled failure hai
+        // (AI temporarily unavailable), server crash nahi. Isse
+        // Cloudflare ke 5xx error metrics galat tarike se
+        // inflate nahi honge.
         return Response.json(
           { success: false, error: error?.message || String(error) },
-          { status: 500, headers: corsHeaders }
+          { status: 200, headers: corsHeaders }
         );
       }
     }
@@ -343,6 +347,9 @@ export default {
           error
         );
 
+        // 🆕 200 status — app.js already retries + falls back
+        // gracefully on success:false, isliye yeh genuine server
+        // crash nahi hai, ek handled/expected condition hai
         return Response.json(
           {
             success: false,
@@ -352,7 +359,7 @@ export default {
               "Quote generation failed."
           },
           {
-            status: 500,
+            status: 200,
             headers: corsHeaders
           }
         );
@@ -453,25 +460,38 @@ IMPORTANT — absolutely no text or writing of any kind:
 
         // ------------------------------------
         // 🤖 CLOUDFLARE WORKERS AI (Flux)
+        // 🆕 2 baar retry karo agar pehli koshish
+        // fail ho jaye (transient AI hiccup)
         // ------------------------------------
 
-        const result = await env.AI.run(
-          "@cf/black-forest-labs/flux-1-schnell",
-          {
-            prompt: prompt,
-            steps: 6
+        let base64Image = null;
+
+        for (let attempt = 0; attempt < 2; attempt++) {
+
+          try {
+
+            const result = await env.AI.run(
+              "@cf/black-forest-labs/flux-1-schnell",
+              {
+                prompt: prompt,
+                steps: 6
+              }
+            );
+
+            base64Image = result?.image || null;
+
+            if (base64Image) break;
+
+          } catch (aiError) {
+
+            console.error("Flux attempt " + attempt + " failed:", aiError);
           }
-        );
+        }
 
 
         // ------------------------------------
         // 🖼️ IMAGE (base64 PNG)
         // ------------------------------------
-
-        const base64Image =
-          result?.image ||
-          null;
-
 
         if (!base64Image) {
 
@@ -505,6 +525,9 @@ IMPORTANT — absolutely no text or writing of any kind:
           error
         );
 
+        // 🆕 200 status — app.js ke paas already gradient
+        // fallback hai jab background generation fail ho,
+        // isliye yeh genuine server crash nahi hai
         return Response.json(
           {
             success: false,
@@ -514,7 +537,7 @@ IMPORTANT — absolutely no text or writing of any kind:
               "Background generation failed."
           },
           {
-            status: 500,
+            status: 200,
             headers: corsHeaders
           }
         );
