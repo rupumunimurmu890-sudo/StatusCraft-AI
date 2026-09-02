@@ -1125,10 +1125,17 @@ async function generateStatus() {
               image.src = bgData.image;
             });
 
+          // 🆕 AI background ko halka blur karo — Flux model
+          // kabhi-kabhi fake/garbled text-jaisi shapes bana deta
+          // hai; blur karne se woh dhundhli ho jaati hain, atmospheric
+          // bokeh feel bhi banti hai (photo ka mood/color same rehta hai)
+          ctx.filter = "blur(7px)";
           drawImageCover(bgImage);
+          ctx.filter = "none";
 
-          // Text readable rakhne ke liye halka dark overlay
-          ctx.fillStyle = "rgba(0,0,0,0.35)";
+          // Text readable rakhne ke liye dark overlay (thoda strong
+          // kiya hai blur ke saath extra safety ke liye)
+          ctx.fillStyle = "rgba(0,0,0,0.42)";
           ctx.fillRect(0, 0, canvasW, canvasH);
 
           backgroundDrawn = true;
