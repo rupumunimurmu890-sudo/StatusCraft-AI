@@ -114,7 +114,7 @@ RULES:
   for (let attempt = 0; attempt < 3; attempt++) {
 
     const result = await env.AI.run(
-      "@cf/meta/llama-3.1-8b-instruct",
+      "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
       {
         messages: [
           { role: "user", content: buildPrompt() }
